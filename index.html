@@ -449,48 +449,140 @@
   </div>
 
   <!-- ===== Footer (Imagem 3) ===== -->
-  <footer>
-    <div class="footer-inner">
-      <div>
-        <div class="brand">
-          <!-- Suba o logo na raiz do projeto com o nome "logo.svg" -->
-          <img src="logo.svg" alt="Ely SolarHub" />
-          <div class="name">Ely<br/>SolarHub</div>
-        </div>
-
-        <div class="footer-meta">
-          <div><strong>CNPJ:</strong> 64.072.577/0001-91</div>
-          <div><strong>Domínio:</strong> elysolarhub.com.br</div>
-          <div><strong>E-mail:</strong> <a href="mailto:contato@elysolarhub.com.br">contato@elysolarhub.com.br</a></div>
-          <div><strong>WhatsApp:</strong> <a href="https://wa.me/5561996140478" target="_blank" rel="noopener">(61) 99614-0478</a></div>
-          <div><strong>Instagram:</strong> <a href="https://instagram.com/elysolarhub" target="_blank" rel="noopener">@elysolarhub</a></div>
+ <!-- ===== Footer (SUBSTITUIR ESTE BLOCO INTEIRO) ===== -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="brand">
+        <!-- Logo: mantém proporção e evita “desconfigurar” -->
+        <img src="logo.png" alt="Ely SolarHub" class="brand-logo" />
+        <div class="brand-name" aria-label="Ely SolarHub">
+          <span class="brand-name-top">Ely</span>
+          <span class="brand-name-bottom">SolarHub</span>
         </div>
       </div>
 
-      <div>
-        <div class="footer-title">Links</div>
-        <div class="footer-links">
-          <a href="#quem-somos">Quem somos</a>
-          <a href="#como-funciona">Como funciona</a>
-          <a href="#remuneracao">Remuneração</a>
-          <a href="#base-legal">Base legal</a>
-          <a href="#faq">FAQ</a>
-          <a href="#receber-proposta">Receber proposta</a>
-        </div>
-      </div>
-
-      <div>
-        <div class="footer-title">Transparência</div>
-        <div class="footer-note">
-          Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE.
-          Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado.
-          Simulações têm caráter exclusivamente ilustrativo.
-        </div>
+      <div class="footer-meta">
+        <div><strong>CNPJ:</strong> 64.072.577/0001-91</div>
+        <div><strong>Domínio:</strong> <a href="https://elysolarhub.com.br" target="_blank" rel="noopener">elysolarhub.com.br</a></div>
+        <div><strong>E-mail:</strong> <a href="mailto:contato@elysolarhub.com.br">contato@elysolarhub.com.br</a></div>
+        <div><strong>WhatsApp:</strong> <a href="https://wa.me/5561996140478" target="_blank" rel="noopener">(61) 99614-0478</a></div>
+        <div><strong>Instagram:</strong> <a href="https://instagram.com/elysolarhub" target="_blank" rel="noopener">@elysolarhub</a></div>
       </div>
     </div>
 
-    <div class="copyright">© 2026 Ely SolarHub Ltda — Todos os direitos reservados.</div>
-  </footer>
+    <div>
+      <div class="footer-title">Links</div>
+      <div class="footer-links">
+        <a href="https://elysolarhub.com.br/#quem-somos" target="_blank" rel="noopener">Quem somos</a>
+        <a href="https://elysolarhub.com.br/#como-funciona" target="_blank" rel="noopener">Como funciona</a>
+        <a href="https://elysolarhub.com.br/#remuneracao" target="_blank" rel="noopener">Remuneração</a>
+        <a href="https://elysolarhub.com.br/#base-legal" target="_blank" rel="noopener">Base legal</a>
+        <a href="https://elysolarhub.com.br/#faq" target="_blank" rel="noopener">FAQ</a>
+        <a href="https://elysolarhub.com.br/#receber-proposta" target="_blank" rel="noopener">Receber proposta</a>
+      </div>
+    </div>
+
+    <div>
+      <div class="footer-title">Transparência</div>
+      <div class="footer-note">
+        Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE.
+        Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado.
+        Simulações têm caráter exclusivamente ilustrativo.
+      </div>
+    </div>
+  </div>
+
+  <div class="copyright">© 2026 Ely SolarHub Ltda — Todos os direitos reservados.</div>
+</footer>
+
+<!-- ===== CSS EXTRA (COLE NO FINAL DO SEU <style>) ===== -->
+<style>
+  /* Ajustes finos para ficar como na imagem 2 */
+  footer{
+    margin-top:44px;
+    background:#f8fafc;
+    border-top:1px solid var(--border);
+  }
+
+  .footer-inner{
+    max-width:1100px;
+    margin:0 auto;
+    padding:26px 20px;
+    display:grid;
+    grid-template-columns: 1.2fr 1fr 1.3fr;
+    gap:22px;
+    align-items:start;
+  }
+
+  @media (max-width: 980px){
+    .footer-inner{ grid-template-columns: 1fr; }
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:14px;
+  }
+
+  /* Logo travado para não deformar */
+  .brand-logo{
+    width:70px;
+    height:70px;
+    object-fit:contain;
+    display:block;
+  }
+
+  .brand-name{
+    line-height:1;
+    font-weight:900;
+    color:#0f172a;
+  }
+  .brand-name-top{
+    display:block;
+    font-size:30px;
+    letter-spacing:.2px;
+  }
+  .brand-name-bottom{
+    display:block;
+    font-size:30px;
+    letter-spacing:.2px;
+  }
+
+  .footer-title{
+    font-weight:900;
+    margin-bottom:10px;
+    color:#0f172a;
+  }
+
+  .footer-meta{
+    color:#0f172a;
+    font-size:14px;
+    line-height:1.9;
+  }
+
+  .footer-links a{
+    display:block;
+    margin:8px 0;
+    font-size:14px;
+    color:#0f172a;
+  }
+
+  .footer-note{
+    color:#0f172a;
+    font-size:14px;
+    line-height:1.9;
+  }
+
+  .copyright{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    padding:14px 20px 22px;
+  }
+</style>
+
 
   <script>
     const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
