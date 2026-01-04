@@ -10,23 +10,33 @@
       --bg:#ffffff;
       --surface:#ffffff;
       --surface-alt:#f8fafc;
-      --text:#1f2937;
-      --muted:#6b7280;
+      --text:#0f172a;
+      --muted:#64748b;
       --border:#e5e7eb;
+
       --primary:#2fd27a;
       --primary-contrast:#0b4126;
+
+      /* verde mais vibrante para ECONOMIA */
+      --economy:#16a34a; /* verde vivo (combina com desconto) */
+      --economy-contrast:#0b4126;
+
       --shadow: 0 10px 25px rgba(15, 23, 42, .06);
+      --radius:14px;
     }
 
     *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
 
     body{
-      margin:0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background:var(--bg);
       color:var(--text);
       line-height:1.6;
     }
+
+    a{color:inherit;text-decoration:none}
+    a:hover{text-decoration:underline}
 
     .container{
       max-width:1100px;
@@ -37,7 +47,7 @@
     .card{
       background:var(--surface);
       border:1px solid var(--border);
-      border-radius:14px;
+      border-radius:var(--radius);
       padding:32px;
       box-shadow: var(--shadow);
     }
@@ -45,10 +55,17 @@
     h1{
       margin:0 0 8px;
       font-size:28px;
+      letter-spacing:.2px;
+    }
+
+    h2{
+      margin:0 0 14px;
+      font-size:22px;
+      letter-spacing:.2px;
     }
 
     .subtitle{
-      margin:0 0 28px;
+      margin:0 0 24px;
       color:var(--muted);
     }
 
@@ -79,7 +96,7 @@
     input:focus, select:focus{
       outline:none;
       border-color:var(--primary);
-      box-shadow:0 0 0 2px rgba(47,210,122,.15);
+      box-shadow:0 0 0 2px rgba(47,210,122,.18);
     }
 
     .helper{
@@ -89,7 +106,7 @@
     }
 
     .actions{
-      margin-top:24px;
+      margin-top:22px;
       display:flex;
       gap:12px;
       flex-wrap:wrap;
@@ -100,35 +117,29 @@
       font-size:15px;
       border-radius:10px;
       cursor:pointer;
+      font-weight:600;
     }
 
     .btn-primary{
       background:var(--primary);
       color:var(--primary-contrast);
       border:none;
-      font-weight:600;
     }
 
     .btn-secondary{
       background:#fff;
       color:var(--text);
       border:1px solid var(--border);
-      font-weight:600;
     }
 
     .divider{
-      margin-top:28px;
+      margin-top:26px;
       border-top:1px solid var(--border);
     }
 
     .results{
-      margin-top:26px;
+      margin-top:22px;
       display:none;
-    }
-
-    .results h2{
-      margin:0 0 14px;
-      font-size:22px;
     }
 
     .results-grid{
@@ -141,7 +152,7 @@
     .result-box{
       background:var(--surface-alt);
       border:1px solid var(--border);
-      border-radius:14px;
+      border-radius:var(--radius);
       padding:18px;
     }
 
@@ -151,24 +162,18 @@
       margin-bottom:6px;
     }
 
-    /* valores: mais “fortes” e claros */
+    /* padrão dos valores (VRSC e VEF) = sem negrito */
     .result-value{
-      font-size:22px;
-      font-weight:800; /* negrito de verdade */
+      font-size:24px;
+      font-weight:500; /* sem destaque */
       letter-spacing:.2px;
+      font-variant-numeric: tabular-nums;
     }
 
-    /* destaque em verde para “combinar com desconto” */
-    .value-good{
-      color: var(--primary-contrast);
-    }
-    .value-good strong{
-      color: var(--primary-contrast);
-    }
-
-    /* economia em verde (visualmente igual ao botão) */
-    .value-economy{
-      color: #0b4126;
+    /* economia com destaque */
+    .result-value.economy{
+      font-weight:800;
+      color:var(--economy);
     }
 
     .disclaimer{
@@ -177,9 +182,135 @@
       color:var(--muted);
     }
 
-    /* acessibilidade visual de números */
-    .mono{
-      font-variant-numeric: tabular-nums;
+    /* ===== Seções finais (Como funciona / Remuneração / Footer) ===== */
+    .section{
+      margin-top:38px;
+    }
+
+    .section-card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      padding:28px;
+    }
+
+    .grid-4{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:16px;
+    }
+
+    @media (max-width: 980px){
+      .grid-4{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px){
+      .grid-4{ grid-template-columns: 1fr; }
+    }
+
+    .mini-card{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:18px;
+      background:#fff;
+    }
+
+    .mini-card .num{
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .mini-card .title{
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:26px;
+      align-items:start;
+    }
+
+    @media (max-width: 900px){
+      .two-col{ grid-template-columns: 1fr; }
+    }
+
+    .bullets{
+      margin:12px 0 0;
+      padding-left:18px;
+    }
+    .bullets li{ margin:8px 0; }
+
+    /* Footer */
+    footer{
+      margin-top:44px;
+      background:#f8fafc;
+      border-top:1px solid var(--border);
+    }
+
+    .footer-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:26px 20px;
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1.3fr;
+      gap:22px;
+      align-items:start;
+    }
+
+    @media (max-width: 980px){
+      .footer-inner{ grid-template-columns: 1fr; }
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .brand img{
+      width:56px;
+      height:56px;
+      object-fit:contain;
+    }
+
+    .brand .name{
+      font-size:28px;
+      font-weight:900;
+      line-height:1.05;
+    }
+
+    .footer-title{
+      font-weight:900;
+      margin-bottom:10px;
+    }
+
+    .footer-meta{
+      color:var(--text);
+      font-size:14px;
+      line-height:1.9;
+    }
+
+    .footer-links a{
+      display:block;
+      color:#0f172a;
+      margin:8px 0;
+      font-size:14px;
+    }
+
+    .footer-note{
+      color:var(--text);
+      font-size:14px;
+      line-height:1.9;
+    }
+
+    .copyright{
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      padding:14px 20px 22px;
     }
   </style>
 </head>
@@ -192,33 +323,17 @@
         Preencha os campos e clique em <strong>Calcular</strong> para visualizar valores estimados (simulação ilustrativa).
       </p>
 
-      <!-- Form para usar a validação nativa (tooltip “Preencha este campo.”) -->
       <form id="simForm" novalidate>
         <div class="form-grid">
           <div>
             <label for="consumo">Consumo médio (kWh/mês)</label>
-            <input
-              type="number"
-              id="consumo"
-              placeholder="Ex.: 950"
-              min="1"
-              step="1"
-              required
-            />
+            <input type="number" id="consumo" placeholder="Ex.: 950" min="1" step="1" required />
             <div class="helper">Informe o consumo médio mensal em kWh.</div>
           </div>
 
           <div>
             <label for="desconto">Percentual de Desconto (%)</label>
-            <input
-              type="number"
-              id="desconto"
-              placeholder="Ex.: 15"
-              min="0"
-              max="100"
-              step="0.01"
-              required
-            />
+            <input type="number" id="desconto" placeholder="Ex.: 15" min="0" max="100" step="0.01" required />
             <div class="helper">De 0 a 100. Ex.: 15 significa 15%.</div>
           </div>
 
@@ -251,22 +366,22 @@
         <div class="results-grid">
           <div class="result-box">
             <div class="result-title">VRSC</div>
-            <div class="result-value mono" id="vrsc">—</div>
+            <div class="result-value" id="vrsc">—</div>
           </div>
 
           <div class="result-box">
             <div class="result-title">VEF</div>
-            <div class="result-value mono" id="vef">—</div>
+            <div class="result-value" id="vef">—</div>
           </div>
 
           <div class="result-box">
             <div class="result-title">Economia financeira mensal</div>
-            <div class="result-value mono value-economy" id="economiaMensal">—</div>
+            <div class="result-value economy" id="economiaMensal">—</div>
           </div>
 
           <div class="result-box">
             <div class="result-title">Economia financeira anual</div>
-            <div class="result-value mono value-economy" id="economiaAnual">—</div>
+            <div class="result-value economy" id="economiaAnual">—</div>
           </div>
         </div>
 
@@ -275,10 +390,109 @@
         </p>
       </div>
     </div>
+
+    <!-- ===== Conteúdos finais (Imagem 2) ===== -->
+    <div class="section">
+      <h2>Como funciona</h2>
+      <div class="section-card">
+        <div class="grid-4">
+          <div class="mini-card">
+            <div class="num">1. <span class="title">Participação no SCEE</span></div>
+            <div>Você ingressa em arranjo de geração compartilhada dentro da área da sua distribuidora.</div>
+          </div>
+
+          <div class="mini-card">
+            <div class="num">2. <span class="title">Créditos na fatura</span></div>
+            <div>A distribuidora compensa créditos de energia na sua fatura, conforme regras do SCEE.</div>
+          </div>
+
+          <div class="mini-card">
+            <div class="num">3. <span class="title">Apuração oficial</span></div>
+            <div>Comparamos a fatura do ciclo com o <strong>VRSC</strong> (sem compensação) e o <strong>VEF</strong> (após compensação).</div>
+          </div>
+
+          <div class="mini-card">
+            <div class="num">4. <span class="title">Success fee</span></div>
+            <div>Você paga um <strong>percentual da economia apurada</strong> (Economia = <strong>VRSC − VEF</strong>, quando positiva).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Conteúdos finais (Imagem 2) ===== -->
+    <div class="section">
+      <h2>Remuneração baseada na economia (Success Fee)</h2>
+      <div class="section-card">
+        <div class="two-col">
+          <div>
+            <div class="footer-title">Metodologia</div>
+            <ul class="bullets">
+              <li><strong>VRSC</strong>: valor estimado da fatura sem compensação (mesmo ciclo).</li>
+              <li><strong>VEF</strong>: valor efetivamente faturado após compensação.</li>
+              <li><strong>Economia Financeira</strong> = <strong>VRSC − VEF</strong> (quando positiva).</li>
+            </ul>
+            <div style="margin-top:12px;color:var(--text);font-size:14px;">
+              Base documental: <strong>fatura emitida pela distribuidora</strong>. Em caso de divergência, conferência conjunta com documentos oficiais.
+            </div>
+          </div>
+
+          <div>
+            <div class="footer-title">Transparência e natureza do serviço</div>
+            <div style="color:var(--text);font-size:14px;line-height:1.9;">
+              A remuneração possui natureza exclusiva de <strong>prestação de serviços</strong>. Não se vincula a kWh, não representa preço de energia e não configura comercialização elétrica.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
+  <!-- ===== Footer (Imagem 3) ===== -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="brand">
+          <!-- Suba o logo na raiz do projeto com o nome "logo.png" -->
+          <img src="logo.png" alt="Ely SolarHub" />
+          <div class="name">Ely<br/>SolarHub</div>
+        </div>
+
+        <div class="footer-meta">
+          <div><strong>CNPJ:</strong> 64.072.577/0001-91</div>
+          <div><strong>Domínio:</strong> elysolarhub.com.br</div>
+          <div><strong>E-mail:</strong> <a href="mailto:contato@elysolarhub.com.br">contato@elysolarhub.com.br</a></div>
+          <div><strong>WhatsApp:</strong> <a href="https://wa.me/5561996140478" target="_blank" rel="noopener">(61) 99614-0478</a></div>
+          <div><strong>Instagram:</strong> <a href="https://instagram.com/elysolarhub" target="_blank" rel="noopener">@elysolarhub</a></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-title">Links</div>
+        <div class="footer-links">
+          <a href="#quem-somos">Quem somos</a>
+          <a href="#como-funciona">Como funciona</a>
+          <a href="#remuneracao">Remuneração</a>
+          <a href="#base-legal">Base legal</a>
+          <a href="#faq">FAQ</a>
+          <a href="#receber-proposta">Receber proposta</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-title">Transparência</div>
+        <div class="footer-note">
+          Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE.
+          Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado.
+          Simulações têm caráter exclusivamente ilustrativo.
+        </div>
+      </div>
+    </div>
+
+    <div class="copyright">© 2026 Ely SolarHub Ltda — Todos os direitos reservados.</div>
+  </footer>
+
   <script>
-    // Formatação com milhares + padrão brasileiro
     const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
     function calcular(){
@@ -312,13 +526,11 @@
       document.getElementById("results").style.display = "none";
     }
 
-    // Submeter o form com validação nativa (igual ao exemplo “Preencha este campo.”)
     document.getElementById("simForm").addEventListener("submit", function(e){
       e.preventDefault();
 
-      // dispara tooltip nativa se algo estiver inválido
       if (!this.checkValidity()){
-        this.reportValidity();
+        this.reportValidity(); // tooltip “Preencha este campo.”
         return;
       }
 
