@@ -270,11 +270,24 @@
       margin-bottom:14px;
     }
 
-    .brand img{
-      width:56px;
-      height:56px;
-      object-fit:contain;
-    }
+    /* logo do footer (sem limitar em 56px) */
+  .brand img{ width:auto; height:auto; } /* neutraliza regra antiga */
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:0;
+    margin-bottom:14px;
+  }
+
+.brand-logo{
+  width:220px;     /* pode aumentar: 260, 300... */
+  height:auto;
+  max-width:100%;
+  display:block;
+  object-fit:contain;
+}
+
 
     .brand .name{
       font-size:28px;
