@@ -606,6 +606,11 @@
     function calcular(){
       const consumo = parseFloat(document.getElementById("consumo").value);
       const desconto = parseFloat(document.getElementById("desconto").value);
+        if (desconto < 1 || desconto > 30) {
+        alert("Desconto precisa estar entre 1% e 30%");
+        return;
+        }
+      
       const perfil = document.getElementById("perfil").value;
 
       let precoPerfil = 0;
