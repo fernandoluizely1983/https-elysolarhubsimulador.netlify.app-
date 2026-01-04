@@ -15,6 +15,7 @@
       --border:#e5e7eb;
       --primary:#2fd27a;
       --primary-contrast:#0b4126;
+      --shadow: 0 10px 25px rgba(15, 23, 42, .06);
     }
 
     *{box-sizing:border-box}
@@ -38,6 +39,7 @@
       border:1px solid var(--border);
       border-radius:14px;
       padding:32px;
+      box-shadow: var(--shadow);
     }
 
     h1{
@@ -54,11 +56,12 @@
       display:grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap:20px;
+      align-items:start;
     }
 
     label{
       display:block;
-      font-weight:500;
+      font-weight:600;
       margin-bottom:6px;
     }
 
@@ -67,13 +70,11 @@
       padding:12px 14px;
       font-size:15px;
       border:1px solid var(--border);
-      border-radius:8px;
+      border-radius:10px;
       background:#fff;
     }
 
-    input::placeholder{
-      color:#9ca3af;
-    }
+    input::placeholder{ color:#9ca3af; }
 
     input:focus, select:focus{
       outline:none;
@@ -88,7 +89,7 @@
     }
 
     .actions{
-      margin-top:28px;
+      margin-top:24px;
       display:flex;
       gap:12px;
       flex-wrap:wrap;
@@ -97,7 +98,7 @@
     button{
       padding:12px 20px;
       font-size:15px;
-      border-radius:8px;
+      border-radius:10px;
       cursor:pointer;
     }
 
@@ -105,22 +106,29 @@
       background:var(--primary);
       color:var(--primary-contrast);
       border:none;
+      font-weight:600;
     }
 
     .btn-secondary{
       background:#fff;
       color:var(--text);
       border:1px solid var(--border);
-      padding:12px 20px;
-      border-radius:8px;
-      cursor:pointer;
+      font-weight:600;
+    }
+
+    .divider{
+      margin-top:28px;
+      border-top:1px solid var(--border);
     }
 
     .results{
-      margin-top:32px;
-      padding-top:24px;
-      border-top:1px solid var(--border);
+      margin-top:26px;
       display:none;
+    }
+
+    .results h2{
+      margin:0 0 14px;
+      font-size:22px;
     }
 
     .results-grid{
@@ -133,25 +141,45 @@
     .result-box{
       background:var(--surface-alt);
       border:1px solid var(--border);
-      border-radius:10px;
-      padding:16px;
+      border-radius:14px;
+      padding:18px;
     }
 
     .result-title{
       font-size:14px;
       color:var(--muted);
+      margin-bottom:6px;
     }
 
+    /* valores: mais “fortes” e claros */
     .result-value{
-      font-size:20px;
-      font-weight:600;
-      margin-top:4px;
+      font-size:22px;
+      font-weight:800; /* negrito de verdade */
+      letter-spacing:.2px;
+    }
+
+    /* destaque em verde para “combinar com desconto” */
+    .value-good{
+      color: var(--primary-contrast);
+    }
+    .value-good strong{
+      color: var(--primary-contrast);
+    }
+
+    /* economia em verde (visualmente igual ao botão) */
+    .value-economy{
+      color: #0b4126;
     }
 
     .disclaimer{
-      margin-top:16px;
+      margin-top:14px;
       font-size:12px;
       color:var(--muted);
+    }
+
+    /* acessibilidade visual de números */
+    .mono{
+      font-variant-numeric: tabular-nums;
     }
   </style>
 </head>
@@ -161,53 +189,61 @@
     <div class="card">
       <h1>Ely SolarHub — Simulador</h1>
       <p class="subtitle">
-        Preencha os campos e clique em <strong>Calcular</strong> para visualizar valores estimados
-        (simulação ilustrativa).
+        Preencha os campos e clique em <strong>Calcular</strong> para visualizar valores estimados (simulação ilustrativa).
       </p>
 
-      <div class="form-grid">
-        <div>
-          <label for="consumo">Consumo médio (kWh/mês)</label>
-          <input
-            type="number"
-            id="consumo"
-            placeholder="Ex.: 950"
-            min="1"
-          />
-          <div class="helper">Informe o consumo médio mensal em kWh.</div>
-        </div>
+      <!-- Form para usar a validação nativa (tooltip “Preencha este campo.”) -->
+      <form id="simForm" novalidate>
+        <div class="form-grid">
+          <div>
+            <label for="consumo">Consumo médio (kWh/mês)</label>
+            <input
+              type="number"
+              id="consumo"
+              placeholder="Ex.: 950"
+              min="1"
+              step="1"
+              required
+            />
+            <div class="helper">Informe o consumo médio mensal em kWh.</div>
+          </div>
 
-        <div>
-          <label for="desconto">Percentual de Desconto (%)</label>
-          <input
-            type="number"
-            id="desconto"
-            placeholder="Ex.: 15"
-            min="0"
-            max="100"
-          />
-          <div class="helper">De 0 a 100. Ex.: 15 significa 15%.</div>
-        </div>
+          <div>
+            <label for="desconto">Percentual de Desconto (%)</label>
+            <input
+              type="number"
+              id="desconto"
+              placeholder="Ex.: 15"
+              min="0"
+              max="100"
+              step="0.01"
+              required
+            />
+            <div class="helper">De 0 a 100. Ex.: 15 significa 15%.</div>
+          </div>
 
-        <div>
-          <label for="perfil">Perfil</label>
-          <select id="perfil" required>
-            <option value="" selected disabled>Selecione o perfil</option>
-            <option value="comercial">Comercial</option>
-            <option value="residencial">Residencial</option>
-            <option value="rural">Rural</option>
-          </select>
-          <div class="helper">
-            Tarifa de referência ilustrativa:
-            Comercial R$ 0,90 | Residencial R$ 0,89 | Rural R$ 0,70
+          <div>
+            <label for="perfil">Perfil</label>
+            <select id="perfil" required>
+              <option value="" selected disabled>Selecione o perfil</option>
+              <option value="comercial">Comercial</option>
+              <option value="residencial">Residencial</option>
+              <option value="rural">Rural</option>
+            </select>
+            <div class="helper">
+              Tarifa de referência ilustrativa:
+              Comercial R$ 0,90 | Residencial R$ 0,89 | Rural R$ 0,70
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="actions">
-        <button class="btn-primary" onclick="calcular()">Calcular</button>
-        <button class="btn-secondary" onclick="limpar()">Limpar</button>
-      </div>
+        <div class="actions">
+          <button class="btn-primary" type="submit">Calcular</button>
+          <button class="btn-secondary" type="button" onclick="limpar()">Limpar</button>
+        </div>
+      </form>
+
+      <div class="divider"></div>
 
       <div class="results" id="results">
         <h2>Resultados estimados</h2>
@@ -215,57 +251,40 @@
         <div class="results-grid">
           <div class="result-box">
             <div class="result-title">VRSC</div>
-            <div class="result-value" id="vrsc">—</div>
+            <div class="result-value mono" id="vrsc">—</div>
           </div>
 
           <div class="result-box">
             <div class="result-title">VEF</div>
-            <div class="result-value" id="vef">—</div>
+            <div class="result-value mono" id="vef">—</div>
           </div>
 
           <div class="result-box">
             <div class="result-title">Economia financeira mensal</div>
-            <div class="result-value" id="economiaMensal">—</div>
+            <div class="result-value mono value-economy" id="economiaMensal">—</div>
           </div>
 
           <div class="result-box">
-            <div class="result-title">Economia financeira anual (12 meses)</div>
-            <div class="result-value" id="economiaAnual">—</div>
+            <div class="result-title">Economia financeira anual</div>
+            <div class="result-value mono value-economy" id="economiaAnual">—</div>
           </div>
         </div>
 
         <p class="disclaimer">
-          Valores meramente ilustrativos. Não representam promessa de economia,
-          garantia de resultado ou oferta comercial de energia.
+          Valores meramente ilustrativos. Não representam promessa de economia, garantia de resultado ou oferta comercial de energia.
         </p>
       </div>
     </div>
   </div>
 
   <script>
-    function formatBRL(valor){
-      return "R$ " + valor.toFixed(2).replace(".", ",");
-    }
+    // Formatação com milhares + padrão brasileiro
+    const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
     function calcular(){
       const consumo = parseFloat(document.getElementById("consumo").value);
       const desconto = parseFloat(document.getElementById("desconto").value);
       const perfil = document.getElementById("perfil").value;
-
-      if (!consumo || consumo <= 0){
-        alert("Informe um consumo médio válido.");
-        return;
-      }
-
-      if (isNaN(desconto) || desconto < 0 || desconto > 100){
-        alert("Informe um percentual de desconto entre 0 e 100.");
-        return;
-      }
-
-      if (!perfil){
-        alert("Selecione o perfil para continuar.");
-        return;
-      }
 
       let precoPerfil = 0;
       if (perfil === "comercial") precoPerfil = 0.90;
@@ -278,10 +297,10 @@
       const economiaMensal = Math.max(vrsc - vef, 0);
       const economiaAnual = economiaMensal * 12;
 
-      document.getElementById("vrsc").innerText = formatBRL(vrsc);
-      document.getElementById("vef").innerText = formatBRL(vef);
-      document.getElementById("economiaMensal").innerText = formatBRL(economiaMensal);
-      document.getElementById("economiaAnual").innerText = formatBRL(economiaAnual);
+      document.getElementById("vrsc").innerText = brl.format(vrsc);
+      document.getElementById("vef").innerText = brl.format(vef);
+      document.getElementById("economiaMensal").innerText = brl.format(economiaMensal);
+      document.getElementById("economiaAnual").innerText = brl.format(economiaAnual);
 
       document.getElementById("results").style.display = "block";
     }
@@ -292,6 +311,19 @@
       document.getElementById("perfil").value = "";
       document.getElementById("results").style.display = "none";
     }
+
+    // Submeter o form com validação nativa (igual ao exemplo “Preencha este campo.”)
+    document.getElementById("simForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      // dispara tooltip nativa se algo estiver inválido
+      if (!this.checkValidity()){
+        this.reportValidity();
+        return;
+      }
+
+      calcular();
+    });
   </script>
 </body>
 </html>
