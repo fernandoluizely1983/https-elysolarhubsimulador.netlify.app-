@@ -1,265 +1,287 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
   <title>Ely SolarHub — Simulador</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
-  /* ---- Paleta base (alinhada ao site atual) ---- */
-  :root {
-    --bg: #0f1419;           /* fundo escuro */
-    --surface: #101820;      /* painéis/barra */
-    --text: #d7e0ea;         /* texto claro */
-    --muted: #94a3b8;        /* texto secundário */
-    --border: #1f2a35;       /* divisórias */
-    --accent: #22c55e;       /* verde (economia) */
-    --accent-strong: #16a34a;
-    --danger: #fb7185;       /* alerta */
-    --link: #22d3ee;         /* ciano links */
-    --chip-bg: #0b1620;      /* pílulas de dados */
-    --chip-border: #153042;
-  }
+    :root{
+      --bg:#ffffff;
+      --surface:#ffffff;
+      --surface-alt:#f8fafc;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --primary:#2fd27a;
+      --primary-contrast:#0b4126;
+    }
 
-  body { margin:0; background:#0b0f14; color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
-  .wrap { max-width: 920px; margin: 40px auto; padding: 0 16px; }
+    *{box-sizing:border-box}
 
-  /* Cabeçalho simples */
-  .page-title { margin:0 0 8px; font-size: 1.9rem; letter-spacing: .2px; }
-  .page-subtitle { color:var(--muted); margin:0 0 16px; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.6;
+    }
 
-  /* ---- Form ---- */
-  .panel { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
-  .form { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 6px 0 10px; }
-  .field label { display:block; font-size:.92rem; color: var(--muted); margin: 0 0 6px; }
-  .field input, .field select {
-    width:100%;
-    padding:10px 12px;
-    border-radius:10px;
-    border:1px solid #1f2a35;
-    background:#0f1419;
-    color:var(--text);
-    outline: none;
-  }
-  .field input:focus, .field select:focus { border-color: #214a58; box-shadow: 0 0 0 3px rgba(34,211,238,0.12); }
-  .hint { margin-top: 6px; font-size: .82rem; color: var(--muted); }
+    .container{
+      max-width:1100px;
+      margin:40px auto;
+      padding:0 20px;
+    }
 
-  .actions { display:flex; flex-wrap: wrap; gap:12px; margin: 8px 0 0; align-items:center; }
-  .btn-primary { background:#16a34a; color:#0b0f14; border:none; padding:10px 16px; border-radius:10px; font-weight:700; cursor:pointer; }
-  .btn-primary:hover { background:#22c55e; }
-  .btn-secondary { background:transparent; color:var(--link); border:1px solid #214a58; padding:10px 16px; border-radius:10px; cursor:pointer; }
-  .btn-secondary:hover { border-color: #22d3ee; }
-  .error { color: var(--danger); font-size: .9rem; margin: 10px 0 0; display:none; }
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:32px;
+    }
 
-  /* ---- Saída ---- */
-  .sim-output { margin-top: 18px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
-  .sim-output__header .sim-brand { margin: 0; font-size: 1.5rem; font-weight: 800; }
-  .sim-subtitle { margin: 4px 0 0; color: var(--muted); }
-  .sim-divider { border-top: 1px solid var(--border); margin: 16px 0 12px; }
+    h1{
+      margin:0 0 8px;
+      font-size:28px;
+    }
 
-  .sim-line { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-  .chip { background: var(--chip-bg); border: 1px solid var(--chip-border); border-radius: 10px; padding: 8px 10px; font-size: 0.95rem; }
-  .chip strong { color: var(--text); }
-  .chip .ok { color: var(--accent); font-weight: 800; }
+    .subtitle{
+      margin:0 0 28px;
+      color:var(--muted);
+    }
 
-  .sim-card { background: linear-gradient(180deg, rgba(14,42,28,0.55), rgba(12,30,22,0.55)); border: 1px solid rgba(34,197,94,0.35); border-radius: 12px; padding: 14px 16px; margin: 8px 0 12px; }
-  .sim-card__row { margin: 4px 0; font-size: 1.05rem; }
-  .ok { color: var(--accent); font-weight: 700; }
-  .sim-card strong { color: var(--accent-strong); }
+    .form-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap:20px;
+    }
 
-  .sim-note { color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
-  .sim-footer { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 10px; color: var(--muted); }
-  .sim-footer a { color: var(--link); text-decoration: none; }
-  .sim-footer a:hover { text-decoration: underline; }
+    label{
+      display:block;
+      font-weight:500;
+      margin-bottom:6px;
+    }
 
-  @media (max-width: 780px) {
-    .form { grid-template-columns: 1fr; }
-  }
+    input, select{
+      width:100%;
+      padding:12px 14px;
+      font-size:15px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      background:#fff;
+    }
+
+    input::placeholder{
+      color:#9ca3af;
+    }
+
+    input:focus, select:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 2px rgba(47,210,122,.15);
+    }
+
+    .helper{
+      margin-top:6px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .actions{
+      margin-top:28px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      padding:12px 20px;
+      font-size:15px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:var(--primary-contrast);
+      border:none;
+    }
+
+    .btn-secondary{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--border);
+    }
+
+    .results{
+      margin-top:32px;
+      padding-top:24px;
+      border-top:1px solid var(--border);
+      display:none;
+    }
+
+    .results-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap:16px;
+      margin-top:16px;
+    }
+
+    .result-box{
+      background:var(--surface-alt);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:16px;
+    }
+
+    .result-title{
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .result-value{
+      font-size:20px;
+      font-weight:600;
+      margin-top:4px;
+    }
+
+    .disclaimer{
+      margin-top:16px;
+      font-size:12px;
+      color:var(--muted);
+    }
   </style>
 </head>
+
 <body>
-  <main class="wrap">
-    <h1 class="page-title">Ely SolarHub — Simulador</h1>
-    <p class="page-subtitle">Preencha os campos e clique em <strong>Calcular</strong> para visualizar os valores estimados do simulador (ilustrativos).</p>
+  <div class="container">
+    <div class="card">
+      <h1>Ely SolarHub — Simulador</h1>
+      <p class="subtitle">
+        Preencha os campos e clique em <strong>Calcular</strong> para visualizar valores estimados
+        (simulação ilustrativa).
+      </p>
 
-    <!-- Painel de entrada -->
-    <section class="panel" aria-label="Formulário do simulador">
-      <form id="form-simulador" class="form" onsubmit="return false;">
-        <div class="field">
-          <label for="input-consumo">Consumo médio (kWh/mês)</label>
-          <input id="input-consumo" type="number" inputmode="decimal" step="0.01" min="0"
-                 placeholder="Ex.: 1.250,00" />
-          <div class="hint">Informe o consumo médio mensal em kWh (ex.: 950).</div>
+      <div class="form-grid">
+        <div>
+          <label for="consumo">Consumo médio (kWh/mês)</label>
+          <input
+            type="number"
+            id="consumo"
+            placeholder="Ex.: 950"
+            min="1"
+          />
+          <div class="helper">Informe o consumo médio mensal em kWh.</div>
         </div>
 
-        <div class="field">
-          <label for="input-desconto">Percentual de Desconto (%)</label>
-          <input id="input-desconto" type="number" inputmode="decimal" step="0.01" min="0" max="100"
-                 placeholder="Ex.: 15,00" />
-          <div class="hint">De 0 a 100. Ex.: 15 significa 15%.</div>
+        <div>
+          <label for="desconto">Percentual de Desconto (%)</label>
+          <input
+            type="number"
+            id="desconto"
+            placeholder="Ex.: 15"
+            min="0"
+            max="100"
+          />
+          <div class="helper">De 0 a 100. Ex.: 15 significa 15%.</div>
         </div>
 
-        <div class="field">
-          <label for="select-perfil">Perfil</label>
-          <select id="select-perfil">
+        <div>
+          <label for="perfil">Perfil</label>
+          <select id="perfil" required>
+            <option value="" selected disabled>Selecione o perfil</option>
             <option value="comercial">Comercial</option>
             <option value="residencial">Residencial</option>
             <option value="rural">Rural</option>
           </select>
-          <div class="hint">Tarifa de referência usada no cálculo: Comercial 0,90 | Residencial 0,89 | Rural 0,70.</div>
+          <div class="helper">
+            Tarifa de referência ilustrativa:
+            Comercial R$ 0,90 | Residencial R$ 0,89 | Rural R$ 0,70
+          </div>
         </div>
-      </form>
+      </div>
 
       <div class="actions">
-        <button id="btn-calcular" class="btn-primary" type="button">Calcular</button>
-        <button id="btn-limpar" class="btn-secondary" type="button">Limpar</button>
-      </div>
-      <p id="msg-erro" class="error" role="alert"></p>
-    </section>
-
-    <!-- Saída formal do simulador -->
-    <section id="saida-simulador" class="sim-output" aria-live="polite" hidden>
-      <header class="sim-output__header">
-        <h2 class="sim-brand">Ely SolarHub</h2>
-        <p class="sim-subtitle">Saída formal do simulador</p>
-      </header>
-
-      <div class="sim-divider"></div>
-
-      <div class="sim-line" aria-label="Resumo de entradas">
-        <span class="chip">Consumo: <strong id="out-consumo">—</strong> kWh/mês</span>
-        <span class="chip">Perfil: <strong id="out-perfil">—</strong></span>
-        <span class="chip">Preço ref.: <strong id="out-preco">—</strong> / kWh</span>
-        <span class="chip">Desconto: <strong id="out-desconto">—</strong></span>
+        <button class="btn-primary" onclick="calcular()">Calcular</button>
+        <button class="btn-secondary" onclick="limpar()">Limpar</button>
       </div>
 
-      <div class="sim-line" aria-label="Resultados">
-        <span class="chip">VRSC: <strong id="out-vrsc">—</strong></span>
-        <span class="chip">VEF: <strong id="out-vef">—</strong></span>
-        <span class="chip">Economia financeira: <strong class="ok" id="out-economia">—</strong></span>
+      <div class="results" id="results">
+        <h2>Resultados estimados</h2>
+
+        <div class="results-grid">
+          <div class="result-box">
+            <div class="result-title">VRSC</div>
+            <div class="result-value" id="vrsc">—</div>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">VEF</div>
+            <div class="result-value" id="vef">—</div>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">Economia financeira mensal</div>
+            <div class="result-value" id="economia">—</div>
+          </div>
+        </div>
+
+        <p class="disclaimer">
+          Valores meramente ilustrativos. Não representam promessa de economia,
+          garantia de resultado ou oferta comercial de energia.
+        </p>
       </div>
-
-      <div class="sim-card">
-        <p class="sim-card__row"><span class="ok">Economia mensal estimada: </span><strong id="out-economia-mensal">—</strong></p>
-        <p class="sim-card__row"><span class="ok">Economia anual estimada: </span><strong id="out-economia-anual">—</strong></p>
-      </div>
-
-      <p class="sim-note">
-        Valores ilustrativos para simulação interna. Podem variar por regras, tributos, bandeiras, tarifas e condições contratuais.
-      </p>
-
-      <footer class="sim-footer">
-        <p>© Ely SolarHub Ltda · <a href="https://elysolarhub.com.br" target="_blank" rel="noopener">elysolarhub.com.br</a></p>
-      </footer>
-    </section>
-  </main>
+    </div>
+  </div>
 
   <script>
-    // Ely SolarHub — Lógica do simulador (ilustrativa)
+    function calcular(){
+      const consumo = parseFloat(document.getElementById("consumo").value);
+      const desconto = parseFloat(document.getElementById("desconto").value);
+      const perfil = document.getElementById("perfil").value;
 
-    const PRECO_POR_PERFIL = {
-      comercial: 0.90,
-      residencial: 0.89,
-      rural: 0.70
-    };
-
-    const fmtBRL = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
-    const fmtNUM = (v) => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(v);
-
-    function showError(msg) {
-      const el = document.getElementById('msg-erro');
-      el.textContent = msg;
-      el.style.display = 'block';
-    }
-
-    function clearError() {
-      const el = document.getElementById('msg-erro');
-      el.textContent = '';
-      el.style.display = 'none';
-    }
-
-    function getInputs() {
-      // Observação: <input type="number"> usa ponto no value. Aceitamos vírgula também por segurança.
-      const consumoRaw = (document.getElementById('input-consumo').value || '').toString().replace(',', '.');
-      const descontoRaw = (document.getElementById('input-desconto').value || '').toString().replace(',', '.');
-
-      const consumo = parseFloat(consumoRaw);
-      const desconto = parseFloat(descontoRaw);
-      const perfil = document.getElementById('select-perfil').value;
-
-      return { consumo, desconto, perfil };
-    }
-
-    function calcular({ consumo, desconto, perfil }) {
-      const preco = PRECO_POR_PERFIL[perfil] ?? 0;
-
-      // VRSC = consumo * preço do perfil
-      const vrsc = consumo * preco;
-
-      // VEF = VRSC * (1 - desconto%)
-      const vef = vrsc * (1 - (desconto / 100));
-
-      // Economia Financeira = VRSC - VEF (quando positiva)
-      const economia = Math.max(0, vrsc - vef);
-
-      return { preco, vrsc, vef, economia };
-    }
-
-    function render({ consumo, desconto, perfil, preco, vrsc, vef, economia }) {
-      const perfilLabel = perfil.charAt(0).toUpperCase() + perfil.slice(1);
-
-      document.getElementById('out-consumo').textContent = fmtNUM(consumo);
-      document.getElementById('out-perfil').textContent = perfilLabel;
-      document.getElementById('out-preco').textContent = fmtBRL(preco);
-      document.getElementById('out-desconto').textContent = fmtNUM(desconto) + '%';
-
-      document.getElementById('out-vrsc').textContent = fmtBRL(vrsc);
-      document.getElementById('out-vef').textContent = fmtBRL(vef);
-      document.getElementById('out-economia').textContent = economia > 0 ? fmtBRL(economia) : fmtBRL(0);
-
-      document.getElementById('out-economia-mensal').textContent = fmtBRL(economia);
-      document.getElementById('out-economia-anual').textContent = fmtBRL(economia * 12);
-
-      const saida = document.getElementById('saida-simulador');
-      saida.hidden = false;
-      saida.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function validar({ consumo, desconto, perfil }) {
-      if (!Number.isFinite(consumo) || consumo <= 0) {
-        return 'Informe um "Consumo médio (kWh/mês)" válido (maior que zero).';
+      if (!consumo || consumo <= 0){
+        alert("Informe um consumo médio válido.");
+        return;
       }
-      if (!Number.isFinite(desconto) || desconto < 0 || desconto > 100) {
-        return 'Informe um "Percentual de Desconto (%)" válido (de 0 a 100).';
+
+      if (isNaN(desconto) || desconto < 0 || desconto > 100){
+        alert("Informe um percentual de desconto entre 0 e 100.");
+        return;
       }
-      if (!(perfil in PRECO_POR_PERFIL)) {
-        return 'Selecione um perfil válido.';
+
+      if (!perfil){
+        alert("Selecione o perfil para continuar.");
+        return;
       }
-      return null;
+
+      let precoPerfil = 0;
+      if (perfil === "comercial") precoPerfil = 0.90;
+      if (perfil === "residencial") precoPerfil = 0.89;
+      if (perfil === "rural") precoPerfil = 0.70;
+
+      const vrsc = consumo * precoPerfil;
+      const vef = vrsc * (1 - desconto / 100);
+      const economia = Math.max(vrsc - vef, 0);
+
+      document.getElementById("vrsc").innerText =
+        "R$ " + vrsc.toFixed(2).replace(".", ",");
+
+      document.getElementById("vef").innerText =
+        "R$ " + vef.toFixed(2).replace(".", ",");
+
+      document.getElementById("economia").innerText =
+        "R$ " + economia.toFixed(2).replace(".", ",");
+
+      document.getElementById("results").style.display = "block";
     }
 
-    function limpar() {
-      document.getElementById('form-simulador').reset();
-      document.getElementById('saida-simulador').hidden = true;
-      clearError();
+    function limpar(){
+      document.getElementById("consumo").value = "";
+      document.getElementById("desconto").value = "";
+      document.getElementById("perfil").value = "";
+      document.getElementById("results").style.display = "none";
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const btnCalc = document.getElementById('btn-calcular');
-      const btnLimpar = document.getElementById('btn-limpar');
-
-      btnCalc.addEventListener('click', () => {
-        clearError();
-
-        const inputs = getInputs();
-        const err = validar(inputs);
-        if (err) { showError(err); return; }
-
-        const res = calcular(inputs);
-        render({ ...inputs, ...res });
-      });
-
-      btnLimpar.addEventListener('click', limpar);
-    });
   </script>
 </body>
 </html>
