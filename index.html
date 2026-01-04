@@ -111,6 +111,9 @@
       background:#fff;
       color:var(--text);
       border:1px solid var(--border);
+      padding:12px 20px;
+      border-radius:8px;
+      cursor:pointer;
     }
 
     .results{
@@ -222,7 +225,12 @@
 
           <div class="result-box">
             <div class="result-title">Economia financeira mensal</div>
-            <div class="result-value" id="economia">—</div>
+            <div class="result-value" id="economiaMensal">—</div>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">Economia financeira anual (12 meses)</div>
+            <div class="result-value" id="economiaAnual">—</div>
           </div>
         </div>
 
@@ -235,6 +243,10 @@
   </div>
 
   <script>
+    function formatBRL(valor){
+      return "R$ " + valor.toFixed(2).replace(".", ",");
+    }
+
     function calcular(){
       const consumo = parseFloat(document.getElementById("consumo").value);
       const desconto = parseFloat(document.getElementById("desconto").value);
@@ -262,16 +274,14 @@
 
       const vrsc = consumo * precoPerfil;
       const vef = vrsc * (1 - desconto / 100);
-      const economia = Math.max(vrsc - vef, 0);
 
-      document.getElementById("vrsc").innerText =
-        "R$ " + vrsc.toFixed(2).replace(".", ",");
+      const economiaMensal = Math.max(vrsc - vef, 0);
+      const economiaAnual = economiaMensal * 12;
 
-      document.getElementById("vef").innerText =
-        "R$ " + vef.toFixed(2).replace(".", ",");
-
-      document.getElementById("economia").innerText =
-        "R$ " + economia.toFixed(2).replace(".", ",");
+      document.getElementById("vrsc").innerText = formatBRL(vrsc);
+      document.getElementById("vef").innerText = formatBRL(vef);
+      document.getElementById("economiaMensal").innerText = formatBRL(economiaMensal);
+      document.getElementById("economiaAnual").innerText = formatBRL(economiaAnual);
 
       document.getElementById("results").style.display = "block";
     }
