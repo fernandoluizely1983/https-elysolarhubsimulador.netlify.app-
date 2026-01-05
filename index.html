@@ -18,9 +18,7 @@
       --primary-contrast:#0b4126;
 
       /* verde mais vibrante para ECONOMIA */
-      --economy:#16a34a; /* verde vivo (combina com desconto) */
-      --economy-contrast:#0b4126;
-
+      --economy:#16a34a;
       --shadow: 0 10px 25px rgba(15, 23, 42, .06);
       --radius:14px;
     }
@@ -165,7 +163,7 @@
     /* padrão dos valores (VRSC e VEF) = sem negrito */
     .result-value{
       font-size:24px;
-      font-weight:500; /* sem destaque */
+      font-weight:500;
       letter-spacing:.2px;
       font-variant-numeric: tabular-nums;
     }
@@ -266,42 +264,26 @@
     .brand{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:0;
       margin-bottom:14px;
     }
 
-    /* logo do footer (sem limitar em 56px) */
-  .brand img{ width:auto; height:auto; } /* neutraliza regra antiga */
-
-  .brand{
-    display:flex;
-    align-items:center;
-    gap:0;
-    margin-bottom:14px;
-  }
-
-.brand-logo{
-  width:220px;     /* pode aumentar: 260, 300... */
-  height:auto;
-  max-width:100%;
-  display:block;
-  object-fit:contain;
-}
-
-
-    .brand .name{
-      font-size:28px;
-      font-weight:900;
-      line-height:1.05;
+    .brand-logo{
+      width:220px;
+      height:auto;
+      max-width:100%;
+      object-fit:contain;
+      display:block;
     }
 
     .footer-title{
       font-weight:900;
       margin-bottom:10px;
+      color:#0f172a;
     }
 
     .footer-meta{
-      color:var(--text);
+      color:#0f172a;
       font-size:14px;
       line-height:1.9;
     }
@@ -314,7 +296,7 @@
     }
 
     .footer-note{
-      color:var(--text);
+      color:#0f172a;
       font-size:14px;
       line-height:1.9;
     }
@@ -346,16 +328,8 @@
 
           <div>
             <label for="desconto">Percentual de Desconto (%)</label>
-            <input
-               type="number"
-              id="desconto"
-              placeholder="Ex.: 15"
-              min="1"
-              max="30"
-              step="1"
-              required
-              />
-            <div class="helper">De 0 a 100. Ex.: 15 significa 15%.</div>
+            <input type="number" id="desconto" placeholder="Ex.: 15" min="1" max="30" step="1" required />
+            <div class="helper">De 1 a 30. Ex.: 15 significa 15%.</div>
           </div>
 
           <div>
@@ -375,7 +349,7 @@
 
         <div class="actions">
           <button class="btn-primary" type="submit">Calcular</button>
-          <button class="btn-secondary" type="button" onclick="limpar()">Limpar</button>
+          <button class="btn-secondary" type="button" id="btnLimpar">Limpar</button>
           <button class="btn-secondary" type="button" id="btnPdf">Gerar PDF</button>
         </div>
       </form>
@@ -405,85 +379,6 @@
             <div class="result-title">Economia financeira anual</div>
             <div class="result-value economy" id="economiaAnual">—</div>
           </div>
-
-    <!-- Título / Resumo -->
-    <h1 style="margin:18px 0 6px; font-size:20px;">Proposta de Simulação</h1>
-    <div style="font-size:13px; color:#64748b; margin-bottom:14px;">
-      Valores estimados a partir do consumo informado, perfil selecionado e percentual de desconto.
-    </div>
-
-    <!-- Info principal -->
-    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:10px;">
-      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
-        <div style="font-size:12px; color:#64748b;">Consumo médio</div>
-        <div style="font-size:16px; font-weight:800;" id="pdfConsumo">—</div>
-      </div>
-      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
-        <div style="font-size:12px; color:#64748b;">Perfil</div>
-        <div style="font-size:16px; font-weight:800;" id="pdfPerfil">—</div>
-      </div>
-      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
-        <div style="font-size:12px; color:#64748b;">Desconto</div>
-        <div style="font-size:16px; font-weight:800; color:#16a34a;" id="pdfDesconto">—</div>
-      </div>
-    </div>
-
-    <!-- Caixas estilo concorrência (conta atual / conta com desconto / economia) -->
-    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; margin-top:14px;">
-      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff;">
-        <div style="font-size:12px; color:#64748b;">VRSC (sem compensação)</div>
-        <div style="font-size:16px; font-weight:700;" id="pdfVrsc">—</div>
-      </div>
-
-      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff;">
-        <div style="font-size:12px; color:#64748b;">VEF (após compensação)</div>
-        <div style="font-size:16px; font-weight:700;" id="pdfVef">—</div>
-      </div>
-
-      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#f0fdf4;">
-        <div style="font-size:12px; color:#166534;">Economia mensal</div>
-        <div style="font-size:16px; font-weight:900; color:#16a34a;" id="pdfEcoMensal">—</div>
-      </div>
-
-      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#f0fdf4;">
-        <div style="font-size:12px; color:#166534;">Economia anual</div>
-        <div style="font-size:16px; font-weight:900; color:#16a34a;" id="pdfEcoAnual">—</div>
-      </div>
-    </div>
-
-    <!-- Como funciona (compacto, inspirado no seu site e nos exemplos) -->
-    <div style="margin-top:18px; border-top:1px solid #e5e7eb; padding-top:14px;">
-      <h2 style="margin:0 0 10px; font-size:16px;">Como funciona</h2>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12.5px; color:#0f172a;">
-        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
-          <strong>1. Participação no SCEE</strong><br/>
-          Você ingressa em arranjo de geração compartilhada dentro da área da sua distribuidora.
-        </div>
-        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
-          <strong>2. Créditos na fatura</strong><br/>
-          A distribuidora compensa créditos de energia na sua fatura, conforme regras do SCEE.
-        </div>
-        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
-          <strong>3. Apuração oficial</strong><br/>
-          Comparamos a fatura do ciclo com o VRSC e o VEF (após compensação).
-        </div>
-        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
-          <strong>4. Success fee</strong><br/>
-          Remuneração baseada em percentual da economia apurada (quando positiva).
-        </div>
-      </div>
-    </div>
-
-    <!-- Rodapé / Disclaimer -->
-    <div style="margin-top:16px; font-size:10.5px; color:#64748b; line-height:1.6; border-top:1px solid #e5e7eb; padding-top:12px;">
-      <strong>Transparência:</strong> Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE.
-      Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado. Simulações têm caráter exclusivamente ilustrativo.
-      <br/><br/>
-      <strong>Base documental:</strong> fatura emitida pela distribuidora. Em caso de divergência, conferência conjunta com documentos oficiais.
-    </div>
-  </div>
-</div>
-        
         </div>
 
         <p class="disclaimer">
@@ -492,7 +387,6 @@
       </div>
     </div>
 
-    <!-- ===== Conteúdos finais (Imagem 2) ===== -->
     <div class="section">
       <h2>Como funciona</h2>
       <div class="section-card">
@@ -520,7 +414,6 @@
       </div>
     </div>
 
-    <!-- ===== Conteúdos finais (Imagem 2) ===== -->
     <div class="section">
       <h2>Remuneração baseada na economia (Success Fee)</h2>
       <div class="section-card">
@@ -546,166 +439,129 @@
         </div>
       </div>
     </div>
-            <!-- ===== TEMPLATE DO PDF (fica oculto na tela) ===== -->
-<div id="pdfRoot" style="position:fixed; left:-10000px; top:0; width:794px; background:#fff;">
-  <div style="font-family: Inter, Arial, sans-serif; padding:28px; color:#0f172a;">
-    <!-- Cabeçalho -->
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; border-bottom:1px solid #e5e7eb; padding-bottom:14px;">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <!-- Use logo local (mesma pasta) para não dar problema de CORS -->
-        <img id="pdfLogo" src="logo.svg" alt="Ely SolarHub" style="height:46px; width:auto; display:block;" />
-      </div>
-      <div style="text-align:right; font-size:12px; color:#64748b;">
-        <div><strong>Simulação ilustrativa</strong></div>
-        <div id="pdfDate"></div>
-      </div>
-    </div> 
-</div>
+  </div>
 
-  <!-- ===== Footer (Imagem 3) ===== -->
- <!-- ===== Footer (SUBSTITUIR ESTE BLOCO INTEIRO) ===== -->
-<footer>
-  <div class="footer-inner">
-    <div>
-     <div class="brand">
-       <img src="logo.svg" alt="Ely SolarHub" class="brand-logo" />
-     </div>
-        <div class="footer-meta">
-        <div><strong>CNPJ:</strong> 64.072.577/0001-91</div>
-        <div><strong>Domínio:</strong> <a href="https://elysolarhub.com.br" target="_blank" rel="noopener">elysolarhub.com.br</a></div>
-        <div><strong>E-mail:</strong> <a href="mailto:contato@elysolarhub.com.br">contato@elysolarhub.com.br</a></div>
-        <div><strong>WhatsApp:</strong> <a href="https://wa.me/5561996140478" target="_blank" rel="noopener">(61) 99614-0478</a></div>
-        <div><strong>Instagram:</strong> <a href="https://instagram.com/elysolarhub" target="_blank" rel="noopener">@elysolarhub</a></div>
+  <!-- ===== TEMPLATE DO PDF (FORA DA TELA, MAS RENDERIZÁVEL) ===== -->
+  <div id="pdfRoot" style="position:fixed; left:-10000px; top:0; width:794px; background:#fff;">
+    <div style="font-family: Inter, Arial, sans-serif; padding:28px; color:#0f172a;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; border-bottom:1px solid #e5e7eb; padding-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <img id="pdfLogo" src="logo.svg" alt="Ely SolarHub" style="height:46px; width:auto; display:block;" />
+        </div>
+        <div style="text-align:right; font-size:12px; color:#64748b;">
+          <div><strong>Simulação ilustrativa</strong></div>
+          <div id="pdfDate"></div>
+        </div>
       </div>
-    </div>
 
-    <div>
-      <div class="footer-title">Links</div>
-      <div class="footer-links">
-        <a href="https://elysolarhub.com.br/#quem-somos" target="_blank" rel="noopener">Quem somos</a>
-        <a href="https://elysolarhub.com.br/#como-funciona" target="_blank" rel="noopener">Como funciona</a>
-        <a href="https://elysolarhub.com.br/#remuneracao" target="_blank" rel="noopener">Remuneração</a>
-        <a href="https://elysolarhub.com.br/#base-legal" target="_blank" rel="noopener">Base legal</a>
-        <a href="https://elysolarhub.com.br/#faq" target="_blank" rel="noopener">FAQ</a>
-        <a href="https://elysolarhub.com.br/#receber-proposta" target="_blank" rel="noopener">Receber proposta</a>
+      <h1 style="margin:18px 0 6px; font-size:20px;">Proposta de Simulação</h1>
+      <div style="font-size:13px; color:#64748b; margin-bottom:14px;">
+        Valores estimados a partir do consumo informado, perfil selecionado e percentual de desconto.
       </div>
-    </div>
 
-    <div>
-      <div class="footer-title">Transparência</div>
-      <div class="footer-note">
-        Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE.
-        Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado.
-        Simulações têm caráter exclusivamente ilustrativo.
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:10px;">
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+          <div style="font-size:12px; color:#64748b;">Consumo médio</div>
+          <div style="font-size:16px; font-weight:800;" id="pdfConsumo">—</div>
+        </div>
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+          <div style="font-size:12px; color:#64748b;">Perfil</div>
+          <div style="font-size:16px; font-weight:800;" id="pdfPerfil">—</div>
+        </div>
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+          <div style="font-size:12px; color:#64748b;">Desconto</div>
+          <div style="font-size:16px; font-weight:800; color:#16a34a;" id="pdfDesconto">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; margin-top:14px;">
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff;">
+          <div style="font-size:12px; color:#64748b;">VRSC (sem compensação)</div>
+          <div style="font-size:16px; font-weight:700;" id="pdfVrsc">—</div>
+        </div>
+
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff;">
+          <div style="font-size:12px; color:#64748b;">VEF (após compensação)</div>
+          <div style="font-size:16px; font-weight:700;" id="pdfVef">—</div>
+        </div>
+
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#f0fdf4;">
+          <div style="font-size:12px; color:#166534;">Economia mensal</div>
+          <div style="font-size:16px; font-weight:900; color:#16a34a;" id="pdfEcoMensal">—</div>
+        </div>
+
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#f0fdf4;">
+          <div style="font-size:12px; color:#166534;">Economia anual</div>
+          <div style="font-size:16px; font-weight:900; color:#16a34a;" id="pdfEcoAnual">—</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; font-size:10.5px; color:#64748b; line-height:1.6; border-top:1px solid #e5e7eb; padding-top:12px;">
+        <strong>Transparência:</strong> Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE.
+        Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado. Simulações têm caráter exclusivamente ilustrativo.
+        <br/><br/>
+        <strong>Base documental:</strong> fatura emitida pela distribuidora. Em caso de divergência, conferência conjunta com documentos oficiais.
       </div>
     </div>
   </div>
 
-  <div class="copyright">© 2026 Ely SolarHub Ltda — Todos os direitos reservados.</div>
-</footer>
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="brand">
+          <img src="logo.svg" alt="Ely SolarHub" class="brand-logo" />
+        </div>
 
-<!-- ===== CSS EXTRA (COLE NO FINAL DO SEU <style>) ===== -->
-<style>
-  /* Ajustes finos para ficar como na imagem 2 */
-  footer{
-    margin-top:44px;
-    background:#f8fafc;
-    border-top:1px solid var(--border);
-  }
+        <div class="footer-meta">
+          <div><strong>CNPJ:</strong> 64.072.577/0001-91</div>
+          <div><strong>Domínio:</strong> <a href="https://elysolarhub.com.br" target="_blank" rel="noopener">elysolarhub.com.br</a></div>
+          <div><strong>E-mail:</strong> <a href="mailto:contato@elysolarhub.com.br">contato@elysolarhub.com.br</a></div>
+          <div><strong>WhatsApp:</strong> <a href="https://wa.me/5561996140478" target="_blank" rel="noopener">(61) 99614-0478</a></div>
+          <div><strong>Instagram:</strong> <a href="https://instagram.com/elysolarhub" target="_blank" rel="noopener">@elysolarhub</a></div>
+        </div>
+      </div>
 
-  .footer-inner{
-    max-width:1100px;
-    margin:0 auto;
-    padding:26px 20px;
-    display:grid;
-    grid-template-columns: 1.2fr 1fr 1.3fr;
-    gap:22px;
-    align-items:start;
-  }
+      <div>
+        <div class="footer-title">Links</div>
+        <div class="footer-links">
+          <a href="https://elysolarhub.com.br/#quem-somos" target="_blank" rel="noopener">Quem somos</a>
+          <a href="https://elysolarhub.com.br/#como-funciona" target="_blank" rel="noopener">Como funciona</a>
+          <a href="https://elysolarhub.com.br/#remuneracao" target="_blank" rel="noopener">Remuneração</a>
+          <a href="https://elysolarhub.com.br/#base-legal" target="_blank" rel="noopener">Base legal</a>
+          <a href="https://elysolarhub.com.br/#faq" target="_blank" rel="noopener">FAQ</a>
+          <a href="https://elysolarhub.com.br/#receber-proposta" target="_blank" rel="noopener">Receber proposta</a>
+        </div>
+      </div>
 
-  @media (max-width: 980px){
-    .footer-inner{ grid-template-columns: 1fr; }
-  }
+      <div>
+        <div class="footer-title">Transparência</div>
+        <div class="footer-note">
+          Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE.
+          Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado.
+          Simulações têm caráter exclusivamente ilustrativo.
+        </div>
+      </div>
+    </div>
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:0;
-  margin-bottom:14px;
-}
-
-  /* Logo travado para não deformar */
-.brand-logo{
-  width:220px;      /* ajuste fino: 200–260 se quiser */
-  height:auto;
-  max-width:100%;
-  object-fit:contain;
-  display:block;
-}
-
-  .brand-name{
-    line-height:1;
-    font-weight:900;
-    color:#0f172a;
-  }
-  .brand-name-top{
-    display:block;
-    font-size:30px;
-    letter-spacing:.2px;
-  }
-  .brand-name-bottom{
-    display:block;
-    font-size:30px;
-    letter-spacing:.2px;
-  }
-
-  .footer-title{
-    font-weight:900;
-    margin-bottom:10px;
-    color:#0f172a;
-  }
-
-  .footer-meta{
-    color:#0f172a;
-    font-size:14px;
-    line-height:1.9;
-  }
-
-  .footer-links a{
-    display:block;
-    margin:8px 0;
-    font-size:14px;
-    color:#0f172a;
-  }
-
-  .footer-note{
-    color:#0f172a;
-    font-size:14px;
-    line-height:1.9;
-  }
-
-  .copyright{
-    text-align:center;
-    color:var(--muted);
-    font-size:13px;
-    padding:14px 20px 22px;
-  }
-</style>
+    <div class="copyright">© 2026 Ely SolarHub Ltda — Todos os direitos reservados.</div>
+  </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  
+
   <script>
     const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
     function calcular(){
       const consumo = parseFloat(document.getElementById("consumo").value);
       const desconto = parseFloat(document.getElementById("desconto").value);
-        if (desconto < 1 || desconto > 30) {
+      const perfil = document.getElementById("perfil").value;
+
+      if (!isFinite(consumo) || consumo <= 0) return;
+      if (!isFinite(desconto) || desconto < 1 || desconto > 30) {
         alert("Desconto precisa estar entre 1% e 30%");
         return;
-        }
-      
-      const perfil = document.getElementById("perfil").value;
+      }
+      if (!perfil) return;
 
       let precoPerfil = 0;
       if (perfil === "comercial") precoPerfil = 0.90;
@@ -714,7 +570,6 @@
 
       const vrsc = consumo * precoPerfil;
       const vef = vrsc * (1 - desconto / 100);
-
       const economiaMensal = Math.max(vrsc - vef, 0);
       const economiaAnual = economiaMensal * 12;
 
@@ -733,99 +588,81 @@
       document.getElementById("results").style.display = "none";
     }
 
+    document.getElementById("btnLimpar").addEventListener("click", limpar);
+
     document.getElementById("simForm").addEventListener("submit", function(e){
       e.preventDefault();
-
       if (!this.checkValidity()){
-        this.reportValidity(); // tooltip “Preencha este campo.”
+        this.reportValidity();
         return;
       }
-
       calcular();
     });
 
     function perfilLabel(value){
-  if (value === "comercial") return "Comercial";
-  if (value === "residencial") return "Residencial";
-  if (value === "rural") return "Rural";
-  return "—";
-}
-
-function kwhLabel(valor){
-  const n = Number(valor);
-  if (!isFinite(n)) return "—";
-  return n.toLocaleString("pt-BR") + " kWh/mês";
-}
-
-function ensureCalculatedOrFail(){
-  const results = document.getElementById("results");
-  // se ainda não calculou, tenta validar e calcular primeiro
-  if (!results || results.style.display !== "block") {
-    const form = document.getElementById("simForm");
-    if (!form.checkValidity()){
-      form.reportValidity();
-      return false;
+      if (value === "comercial") return "Comercial";
+      if (value === "residencial") return "Residencial";
+      if (value === "rural") return "Rural";
+      return "—";
     }
-    // chama seu calcular() existente
-    calcular();
-  }
-  return true;
-}
 
-document.getElementById("btnPdf").addEventListener("click", async () => {
-  if (!ensureCalculatedOrFail()) return;
+    function kwhLabel(valor){
+      const n = Number(valor);
+      if (!isFinite(n)) return "—";
+      return n.toLocaleString("pt-BR") + " kWh/mês";
+    }
 
-  // pega inputs
-  const consumo = document.getElementById("consumo").value;
-  const desconto = document.getElementById("desconto").value;
-  const perfil = document.getElementById("perfil").value;
+    function ensureCalculatedOrFail(){
+      const results = document.getElementById("results");
+      if (!results || results.style.display !== "block") {
+        const form = document.getElementById("simForm");
+        if (!form.checkValidity()){
+          form.reportValidity();
+          return false;
+        }
+        calcular();
+        if (document.getElementById("results").style.display !== "block") return false;
+      }
+      return true;
+    }
 
-  // pega resultados já renderizados
-  const vrsc = document.getElementById("vrsc").innerText;
-  const vef = document.getElementById("vef").innerText;
-  const ecoMensal = document.getElementById("economiaMensal").innerText;
-  const ecoAnual = document.getElementById("economiaAnual").innerText;
+    document.getElementById("btnPdf").addEventListener("click", async () => {
+      if (!ensureCalculatedOrFail()) return;
 
-  // preenche template
-  document.getElementById("pdfDate").innerText =
-    new Date().toLocaleString("pt-BR");
+      const consumo = document.getElementById("consumo").value;
+      const desconto = document.getElementById("desconto").value;
+      const perfil = document.getElementById("perfil").value;
 
-  document.getElementById("pdfConsumo").innerText = kwhLabel(consumo);
-  document.getElementById("pdfPerfil").innerText = perfilLabel(perfil);
-  document.getElementById("pdfDesconto").innerText = `${Number(desconto).toLocaleString("pt-BR")} %`;
+      const vrsc = document.getElementById("vrsc").innerText;
+      const vef = document.getElementById("vef").innerText;
+      const ecoMensal = document.getElementById("economiaMensal").innerText;
+      const ecoAnual = document.getElementById("economiaAnual").innerText;
 
-  document.getElementById("pdfVrsc").innerText = vrsc;
-  document.getElementById("pdfVef").innerText = vef;
-  document.getElementById("pdfEcoMensal").innerText = ecoMensal;
-  document.getElementById("pdfEcoAnual").innerText = ecoAnual;
+      document.getElementById("pdfDate").innerText = new Date().toLocaleString("pt-BR");
+      document.getElementById("pdfConsumo").innerText = kwhLabel(consumo);
+      document.getElementById("pdfPerfil").innerText = perfilLabel(perfil);
+      document.getElementById("pdfDesconto").innerText = `${Number(desconto).toLocaleString("pt-BR")} %`;
 
-  const element = document.getElementById("pdfRoot");
+      document.getElementById("pdfVrsc").innerText = vrsc;
+      document.getElementById("pdfVef").innerText = vef;
+      document.getElementById("pdfEcoMensal").innerText = ecoMensal;
+      document.getElementById("pdfEcoAnual").innerText = ecoAnual;
 
-  // força renderização antes de capturar
-  element.style.left = "-10000px";
-  element.style.top = "0";
-  element.style.background = "#fff";
+      const element = document.getElementById("pdfRoot");
 
-  // dá um “tick” pro browser aplicar layout antes do canvas
-  await new Promise(r => requestAnimationFrame(() => r()));
-  await new Promise(r => setTimeout(r, 80));
+      await new Promise(r => requestAnimationFrame(() => r()));
+      await new Promise(r => setTimeout(r, 80));
 
-  const opt = {
-    margin: [10, 10, 10, 10],
-    filename: `ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`,
-    image: { type: "jpeg", quality: 0.95 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff"
-    },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-  };
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`,
+        image: { type: "jpeg", quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      };
 
-  await html2pdf().set(opt).from(element).save();
-
-
-   
+      await html2pdf().set(opt).from(element).save();
+    });
   </script>
 </body>
 </html>
