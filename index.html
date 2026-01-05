@@ -650,18 +650,53 @@
 
       const element = document.getElementById("pdfRoot");
 
-      await new Promise(r => requestAnimationFrame(() => r()));
-      await new Promise(r => setTimeout(r, 80));
+/* --- TRUQUE: coloca o template dentro da viewport (invisível) --- */
+const prev = {
+  position: element.style.position,
+  left: element.style.left,
+  top: element.style.top,
+  opacity: element.style.opacity,
+  pointerEvents: element.style.pointerEvents,
+  zIndex: element.style.zIndex
+};
 
-      const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`,
-        image: { type: "jpeg", quality: 0.95 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-      };
+element.style.position = "fixed";
+element.style.left = "0";
+element.style.top = "0";
+element.style.opacity = "0";          // invisível, mas renderizável
+element.style.pointerEvents = "none";
+element.style.zIndex = "9999";
 
-      await html2pdf().set(opt).from(element).save();
+// garante que o browser renderizou antes do canvas
+await new Promise(r => requestAnimationFrame(r));
+await new Promise(r => setTimeout(r, 120));
+
+const opt = {
+  margin: [10, 10, 10, 10],
+  filename: `ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`,
+  image: { type: "jpeg", quality: 0.95 },
+  html2canvas: {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+    windowWidth: element.scrollWidth,
+    windowHeight: element.scrollHeight
+  },
+  jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+};
+
+try {
+  await html2pdf().set(opt).from(element).save();
+} finally {
+  // restaura estado original
+  element.style.position = prev.position;
+  element.style.left = prev.left;
+  element.style.top = prev.top;
+  element.style.opacity = prev.opacity;
+  element.style.pointerEvents = prev.pointerEvents;
+  element.style.zIndex = prev.zIndex;
+}
+
     });
   </script>
 </body>
