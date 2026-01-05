@@ -406,21 +406,6 @@
             <div class="result-value economy" id="economiaAnual">—</div>
           </div>
 
-            <!-- ===== TEMPLATE DO PDF (fica oculto na tela) ===== -->
-<div id="pdfRoot" style="position:fixed; left:-10000px; top:0; width:794px; background:#fff;">
-  <div style="font-family: Inter, Arial, sans-serif; padding:28px; color:#0f172a;">
-    <!-- Cabeçalho -->
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; border-bottom:1px solid #e5e7eb; padding-bottom:14px;">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <!-- Use logo local (mesma pasta) para não dar problema de CORS -->
-        <img id="pdfLogo" src="logo.svg" alt="Ely SolarHub" style="height:46px; width:auto; display:block;" />
-      </div>
-      <div style="text-align:right; font-size:12px; color:#64748b;">
-        <div><strong>Simulação ilustrativa</strong></div>
-        <div id="pdfDate"></div>
-      </div>
-    </div>
-
     <!-- Título / Resumo -->
     <h1 style="margin:18px 0 6px; font-size:20px;">Proposta de Simulação</h1>
     <div style="font-size:13px; color:#64748b; margin-bottom:14px;">
@@ -803,17 +788,29 @@ document.getElementById("btnPdf").addEventListener("click", async () => {
 
   const element = document.getElementById("pdfRoot");
 
-  // gera PDF
+  // força renderização antes de capturar
+  element.style.left = "-10000px";
+  element.style.top = "0";
+  element.style.background = "#fff";
+
+  // dá um “tick” pro browser aplicar layout antes do canvas
+  await new Promise(r => requestAnimationFrame(() => r()));
+  await new Promise(r => setTimeout(r, 80));
+
   const opt = {
-    margin: 10,
+    margin: [10, 10, 10, 10],
     filename: `ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`,
     image: { type: "jpeg", quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff"
+    },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
   };
 
   await html2pdf().set(opt).from(element).save();
-});
+
 
    
   </script>
