@@ -405,6 +405,100 @@
             <div class="result-title">Economia financeira anual</div>
             <div class="result-value economy" id="economiaAnual">—</div>
           </div>
+
+            <!-- ===== TEMPLATE DO PDF (fica oculto na tela) ===== -->
+<div id="pdfRoot" style="display:none;">
+  <div style="font-family: Inter, Arial, sans-serif; padding:28px; color:#0f172a;">
+    <!-- Cabeçalho -->
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; border-bottom:1px solid #e5e7eb; padding-bottom:14px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <!-- Use logo local (mesma pasta) para não dar problema de CORS -->
+        <img id="pdfLogo" src="logo.svg" alt="Ely SolarHub" style="height:46px; width:auto; display:block;" />
+      </div>
+      <div style="text-align:right; font-size:12px; color:#64748b;">
+        <div><strong>Simulação ilustrativa</strong></div>
+        <div id="pdfDate"></div>
+      </div>
+    </div>
+
+    <!-- Título / Resumo -->
+    <h1 style="margin:18px 0 6px; font-size:20px;">Proposta de Simulação</h1>
+    <div style="font-size:13px; color:#64748b; margin-bottom:14px;">
+      Valores estimados a partir do consumo informado, perfil selecionado e percentual de desconto.
+    </div>
+
+    <!-- Info principal -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:10px;">
+      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+        <div style="font-size:12px; color:#64748b;">Consumo médio</div>
+        <div style="font-size:16px; font-weight:800;" id="pdfConsumo">—</div>
+      </div>
+      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+        <div style="font-size:12px; color:#64748b;">Perfil</div>
+        <div style="font-size:16px; font-weight:800;" id="pdfPerfil">—</div>
+      </div>
+      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+        <div style="font-size:12px; color:#64748b;">Desconto</div>
+        <div style="font-size:16px; font-weight:800; color:#16a34a;" id="pdfDesconto">—</div>
+      </div>
+    </div>
+
+    <!-- Caixas estilo concorrência (conta atual / conta com desconto / economia) -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; margin-top:14px;">
+      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff;">
+        <div style="font-size:12px; color:#64748b;">VRSC (sem compensação)</div>
+        <div style="font-size:16px; font-weight:700;" id="pdfVrsc">—</div>
+      </div>
+
+      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff;">
+        <div style="font-size:12px; color:#64748b;">VEF (após compensação)</div>
+        <div style="font-size:16px; font-weight:700;" id="pdfVef">—</div>
+      </div>
+
+      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#f0fdf4;">
+        <div style="font-size:12px; color:#166534;">Economia mensal</div>
+        <div style="font-size:16px; font-weight:900; color:#16a34a;" id="pdfEcoMensal">—</div>
+      </div>
+
+      <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#f0fdf4;">
+        <div style="font-size:12px; color:#166534;">Economia anual</div>
+        <div style="font-size:16px; font-weight:900; color:#16a34a;" id="pdfEcoAnual">—</div>
+      </div>
+    </div>
+
+    <!-- Como funciona (compacto, inspirado no seu site e nos exemplos) -->
+    <div style="margin-top:18px; border-top:1px solid #e5e7eb; padding-top:14px;">
+      <h2 style="margin:0 0 10px; font-size:16px;">Como funciona</h2>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12.5px; color:#0f172a;">
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+          <strong>1. Participação no SCEE</strong><br/>
+          Você ingressa em arranjo de geração compartilhada dentro da área da sua distribuidora.
+        </div>
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+          <strong>2. Créditos na fatura</strong><br/>
+          A distribuidora compensa créditos de energia na sua fatura, conforme regras do SCEE.
+        </div>
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+          <strong>3. Apuração oficial</strong><br/>
+          Comparamos a fatura do ciclo com o VRSC e o VEF (após compensação).
+        </div>
+        <div style="border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+          <strong>4. Success fee</strong><br/>
+          Remuneração baseada em percentual da economia apurada (quando positiva).
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé / Disclaimer -->
+    <div style="margin-top:16px; font-size:10.5px; color:#64748b; line-height:1.6; border-top:1px solid #e5e7eb; padding-top:12px;">
+      <strong>Transparência:</strong> Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE.
+      Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado. Simulações têm caráter exclusivamente ilustrativo.
+      <br/><br/>
+      <strong>Base documental:</strong> fatura emitida pela distribuidora. Em caso de divergência, conferência conjunta com documentos oficiais.
+    </div>
+  </div>
+</div>
+        
         </div>
 
         <p class="disclaimer">
