@@ -745,6 +745,77 @@
 
       calcular();
     });
+
+    function perfilLabel(value){
+  if (value === "comercial") return "Comercial";
+  if (value === "residencial") return "Residencial";
+  if (value === "rural") return "Rural";
+  return "—";
+}
+
+function kwhLabel(valor){
+  const n = Number(valor);
+  if (!isFinite(n)) return "—";
+  return n.toLocaleString("pt-BR") + " kWh/mês";
+}
+
+function ensureCalculatedOrFail(){
+  const results = document.getElementById("results");
+  // se ainda não calculou, tenta validar e calcular primeiro
+  if (!results || results.style.display !== "block") {
+    const form = document.getElementById("simForm");
+    if (!form.checkValidity()){
+      form.reportValidity();
+      return false;
+    }
+    // chama seu calcular() existente
+    calcular();
+  }
+  return true;
+}
+
+document.getElementById("btnPdf").addEventListener("click", async () => {
+  if (!ensureCalculatedOrFail()) return;
+
+  // pega inputs
+  const consumo = document.getElementById("consumo").value;
+  const desconto = document.getElementById("desconto").value;
+  const perfil = document.getElementById("perfil").value;
+
+  // pega resultados já renderizados
+  const vrsc = document.getElementById("vrsc").innerText;
+  const vef = document.getElementById("vef").innerText;
+  const ecoMensal = document.getElementById("economiaMensal").innerText;
+  const ecoAnual = document.getElementById("economiaAnual").innerText;
+
+  // preenche template
+  document.getElementById("pdfDate").innerText =
+    new Date().toLocaleString("pt-BR");
+
+  document.getElementById("pdfConsumo").innerText = kwhLabel(consumo);
+  document.getElementById("pdfPerfil").innerText = perfilLabel(perfil);
+  document.getElementById("pdfDesconto").innerText = `${Number(desconto).toLocaleString("pt-BR")} %`;
+
+  document.getElementById("pdfVrsc").innerText = vrsc;
+  document.getElementById("pdfVef").innerText = vef;
+  document.getElementById("pdfEcoMensal").innerText = ecoMensal;
+  document.getElementById("pdfEcoAnual").innerText = ecoAnual;
+
+  const element = document.getElementById("pdfRoot");
+
+  // gera PDF
+  const opt = {
+    margin: 10,
+    filename: `ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`,
+    image: { type: "jpeg", quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+  };
+
+  await html2pdf().set(opt).from(element).save();
+});
+
+   
   </script>
 </body>
 </html>
