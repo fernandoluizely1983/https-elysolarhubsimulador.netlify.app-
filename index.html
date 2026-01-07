@@ -546,7 +546,7 @@
     <div class="copyright">© 2026 Ely SolarHub Ltda — Todos os direitos reservados.</div>
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <script>
     const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -626,39 +626,191 @@
       return true;
     }
 
-    document.getElementById("btnPdf").addEventListener("click", async () => {
-      if (!ensureCalculatedOrFail()) return;
+    async function loadImageAsDataURL(src) {
+  const res = await fetch(src, { cache: "no-store" });
+  const blob = await res.blob();
+  return await new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
 
-      const consumo = document.getElementById("consumo").value;
-      const desconto = document.getElementById("desconto").value;
-      const perfil = document.getElementById("perfil").value;
+function safeNumber(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;
+}
 
-      const vrsc = document.getElementById("vrsc").innerText;
-      const vef = document.getElementById("vef").innerText;
-      const ecoMensal = document.getElementById("economiaMensal").innerText;
-      const ecoAnual = document.getElementById("economiaAnual").innerText;
+document.getElementById("btnPdf").addEventListener("click", async () => {
+  if (!ensureCalculatedOrFail()) return;
 
-      document.getElementById("pdfDate").innerText = new Date().toLocaleString("pt-BR");
-      document.getElementById("pdfConsumo").innerText = kwhLabel(consumo);
-      document.getElementById("pdfPerfil").innerText = perfilLabel(perfil);
-      document.getElementById("pdfDesconto").innerText = `${Number(desconto).toLocaleString("pt-BR")} %`;
+  const consumo = safeNumber(document.getElementById("consumo").value);
+  const desconto = safeNumber(document.getElementById("desconto").value);
+  const perfil = document.getElementById("perfil").value;
 
-      document.getElementById("pdfVrsc").innerText = vrsc;
-      document.getElementById("pdfVef").innerText = vef;
-      document.getElementById("pdfEcoMensal").innerText = ecoMensal;
-      document.getElementById("pdfEcoAnual").innerText = ecoAnual;
+  if (!Number.isFinite(consumo) || consumo <= 0) return;
+  if (!Number.isFinite(desconto) || desconto < 1 || desconto > 30) {
+    alert("Desconto precisa estar entre 1% e 30%");
+    return;
+  }
+  if (!perfil) return;
 
-      const element = document.getElementById("pdfRoot");
+  const vrscTxt = document.getElementById("vrsc").innerText;
+  const vefTxt = document.getElementById("vef").innerText;
+  const ecoMensalTxt = document.getElementById("economiaMensal").innerText;
+  const ecoAnualTxt = document.getElementById("economiaAnual").innerText;
 
-/* --- TRUQUE: coloca o template dentro da viewport (invisível) --- */
-const prev = {
-  position: element.style.position,
-  left: element.style.left,
-  top: element.style.top,
-  opacity: element.style.opacity,
-  pointerEvents: element.style.pointerEvents,
-  zIndex: element.style.zIndex
-};
+  const perfilTxt = perfilLabel(perfil);
+  const consumoTxt = kwhLabel(consumo);
+  const descontoTxt = `${desconto.toLocaleString("pt-BR")} %`;
+  const dataTxt = new Date().toLocaleString("pt-BR");
+
+  const overlay = document.getElementById("pdfOverlay");
+  if (overlay) overlay.style.display = "flex";
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+
+    // Medidas A4
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 12;
+
+    // Carrega logo (precisa estar no root do projeto)
+    let logoDataUrl = null;
+    try {
+      logoDataUrl = await loadImageAsDataURL("logo.png");
+    } catch (e) {
+      // se falhar, segue sem logo
+      logoDataUrl = null;
+    }
+
+    // Header
+    if (logoDataUrl) {
+      // ajusta tamanho do logo (mm). Se precisar maior, aumente w/h.
+      doc.addImage(logoDataUrl, "PNG", margin, 10, 40, 12);
+    }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Simulação ilustrativa", pageW - margin, 14, { align: "right" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(dataTxt, pageW - margin, 19, { align: "right" });
+
+    // Linha
+    doc.setDrawColor(229, 231, 235);
+    doc.line(margin, 25, pageW - margin, 25);
+
+    // Título
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("Proposta de Simulação", margin, 35);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Valores estimados a partir do consumo informado, perfil selecionado e percentual de desconto.", margin, 41);
+
+    // Cards (Consumo / Perfil / Desconto)
+    const cardY = 48;
+    const cardH = 18;
+    const gap = 4;
+    const cardW = (pageW - margin * 2 - gap * 2) / 3;
+
+    function card(x, y, w, h, title, value, valueColorRGB) {
+      doc.setDrawColor(229, 231, 235);
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(x, y, w, h, 3, 3, "FD");
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(title, x + 4, y + 6);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      if (valueColorRGB) doc.setTextColor(...valueColorRGB);
+      else doc.setTextColor(15, 23, 42);
+      doc.text(value, x + 4, y + 14);
+    }
+
+    card(margin, cardY, cardW, cardH, "Consumo médio", consumoTxt);
+    card(margin + cardW + gap, cardY, cardW, cardH, "Perfil", perfilTxt);
+    card(margin + (cardW + gap) * 2, cardY, cardW, cardH, "Desconto", descontoTxt, [22, 163, 74]);
+
+    // Boxes 4 col (VRSC/VEF/Economias)
+    const boxY = 70;
+    const boxH = 22;
+    const boxGap = 4;
+    const boxW = (pageW - margin * 2 - boxGap * 3) / 4;
+
+    function box(x, y, w, h, title, value, isGreen) {
+      doc.setDrawColor(229, 231, 235);
+      if (isGreen) doc.setFillColor(240, 253, 244);
+      else doc.setFillColor(255, 255, 255);
+      doc.roundedRect(x, y, w, h, 3, 3, "FD");
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(isGreen ? 22 : 100, isGreen ? 101 : 100, isGreen ? 52 : 100);
+      doc.text(title, x + 4, y + 7);
+
+      doc.setFont("helvetica", isGreen ? "bold" : "normal");
+      doc.setFontSize(12);
+      doc.setTextColor(isGreen ? 22 : 15, isGreen ? 163 : 23, isGreen ? 74 : 42);
+      doc.text(value, x + 4, y + 16);
+    }
+
+    box(margin, boxY, boxW, boxH, "VRSC", vrscTxt, false);
+    box(margin + (boxW + boxGap) * 1, boxY, boxW, boxH, "VEF", vefTxt, false);
+    box(margin + (boxW + boxGap) * 2, boxY, boxW, boxH, "Economia mensal", ecoMensalTxt, true);
+    box(margin + (boxW + boxGap) * 3, boxY, boxW, boxH, "Economia anual", ecoAnualTxt, true);
+
+    // Disclaimer
+    const discY = 102;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text(
+      "Valores meramente ilustrativos. Não representam promessa de economia, garantia de resultado ou oferta comercial de energia.",
+      margin,
+      discY,
+      { maxWidth: pageW - margin * 2 }
+    );
+
+    // Rodapé (Transparência)
+    doc.setDrawColor(229, 231, 235);
+    doc.line(margin, pageH - 40, pageW - margin, pageH - 40);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Transparência:", margin, pageH - 33);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(100);
+    doc.text(
+      "Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE. " +
+      "Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado. " +
+      "Simulações têm caráter exclusivamente ilustrativo.\n\n" +
+      "Base documental: fatura emitida pela distribuidora. Em caso de divergência, conferência conjunta com documentos oficiais.",
+      margin,
+      pageH - 29,
+      { maxWidth: pageW - margin * 2 }
+    );
+
+    // Salva
+    doc.save(`ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`);
+  } finally {
+    if (overlay) overlay.style.display = "none";
+  }
+});
 
 const overlay = document.getElementById("pdfOverlay");
 overlay.style.display = "flex";
