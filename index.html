@@ -660,12 +660,16 @@ const prev = {
   zIndex: element.style.zIndex
 };
 
+const overlay = document.getElementById("pdfOverlay");
+overlay.style.display = "flex";
+
 element.style.position = "fixed";
 element.style.left = "0";
 element.style.top = "0";
-element.style.opacity = "0";          // invisível, mas renderizável
+element.style.opacity = "1";                 // <<< IMPORTANTÍSSIMO: não pode ser 0
 element.style.pointerEvents = "none";
-element.style.zIndex = "9999";
+element.style.zIndex = "1";                  // fica “atrás” do overlay
+
 
 // garante que o browser renderizou antes do canvas
 await new Promise(r => requestAnimationFrame(r));
@@ -695,9 +699,20 @@ try {
   element.style.opacity = prev.opacity;
   element.style.pointerEvents = prev.pointerEvents;
   element.style.zIndex = prev.zIndex;
+
+  overlay.style.display = "none";
+
 }
 
     });
   </script>
+  
+   <!-- Overlay simples para não “piscar” o template do PDF -->
+  <div id="pdfOverlay" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,.85); z-index:99999; align-items:center; justify-content:center; font-family:Inter, Arial, sans-serif;">
+    <div style="background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:14px 16px; box-shadow:0 10px 25px rgba(15,23,42,.08); color:#0f172a; font-weight:700;">
+      Gerando PDF…
+    </div>
+  </div>
+  
 </body>
 </html>
