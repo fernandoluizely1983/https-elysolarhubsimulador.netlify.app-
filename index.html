@@ -345,6 +345,26 @@
               Comercial R$ 0,90 | Residencial R$ 0,89 | Rural R$ 0,70
             </div>
           </div>
+          <!-- ===== Campos opcionais (aparecem no PDF só se preenchidos) ===== -->
+          <div>
+            <label for="clienteNome">Nome do cliente (opcional)</label>
+              <input type="text" id="clienteNome" placeholder="Ex.: João da Silva" />
+          </div>
+          
+          <div>
+            <label for="clienteDoc">CPF/CNPJ (opcional)</label>
+              <input type="text" id="clienteDoc" placeholder="Ex.: 000.000.000-00 ou 00.000.000/0000-00" />
+          </div>
+          
+          <div>
+            <label for="clienteDist">Distribuidora / UC (opcional)</label>
+            <input type="text" id="clienteDist" placeholder="Ex.: COPEL / UC 123456789" />
+          </div>
+          
+          <div>
+            <label for="clienteCidade">Cidade (opcional)</label>
+            <input type="text" id="clienteCidade" placeholder="Ex.: São Paulo - SP" />
+          </div>
         </div>
 
         <div class="actions">
@@ -602,6 +622,10 @@
     document.getElementById("desconto").value = "";
     document.getElementById("perfil").value = "";
     document.getElementById("results").style.display = "none";
+    document.getElementById("clienteNome").value = "";
+    document.getElementById("clienteDoc").value = "";
+    document.getElementById("clienteDist").value = "";
+    document.getElementById("clienteCidade").value = "";
   }
 
   function ensureCalculatedOrFail(){
@@ -643,6 +667,11 @@
     const consumo = Number(document.getElementById("consumo").value);
     const desconto = Number(document.getElementById("desconto").value);
     const perfil = document.getElementById("perfil").value;
+    const clienteNome = (document.getElementById("clienteNome")?.value || "").trim();
+    const clienteDoc  = (document.getElementById("clienteDoc")?.value || "").trim();
+    const clienteDist = (document.getElementById("clienteDist")?.value || "").trim();
+    const clienteCidade = (document.getElementById("clienteCidade")?.value || "").trim();
+
 
     if (!isFinite(consumo) || consumo <= 0) return;
     if (!isFinite(desconto) || desconto < 1 || desconto > 30) {
@@ -677,15 +706,27 @@
       try { logoDataUrl = await loadImageAsDataURL("logo.png"); } catch(e){}
 
       if (logoDataUrl) doc.addImage(logoDataUrl, "PNG", margin, 10, 40, 12);
-
+      
+      // ===== Cabeçalho forte: Proposta / Nº / Validade =====
+      const propostaNum = "ESH-" + new Date().toISOString().slice(0,10).replaceAll("-","") + "-" + String(Math.floor(Math.random()*9000)+1000);
+      const validadeDias = 7;
+      const validadeDate = new Date(Date.now() + validadeDias*24*60*60*1000);
+      const validadeTxt = validadeDate.toLocaleDateString("pt-BR");
+      
+      doc.setTextColor(15, 23, 42);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text("Simulação ilustrativa", pageW - margin, 14, { align: "right" });
+      doc.setFontSize(14);
+      doc.text("Proposta Comercial / Simulação", pageW - margin, 14, { align: "right" });
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(dataTxt, pageW - margin, 19, { align: "right" });
+      doc.text(`Nº: ${propostaNum}`, pageW - margin, 19, { align: "right" });
+      doc.text(`Validade: até ${validadeTxt}`, pageW - margin, 24, { align: "right" });
+
+      // Linha
+      doc.setDrawColor(229, 231, 235);
+      doc.line(margin, 28, pageW - margin, 28);
 
       doc.setDrawColor(229, 231, 235);
       doc.line(margin, 25, pageW - margin, 25);
@@ -695,13 +736,53 @@
       doc.setFontSize(16);
       doc.text("Proposta de Simulação", margin, 35);
 
+      // ===== Bloco de identificação (opcional) =====
+      let y = 46; // posição inicial após o texto introdutório (ajuste se necessário)
+
+      const rows = [];
+     if (clienteNome) rows.push(["Cliente", clienteNome]);
+    if (clienteDoc) rows.push(["CPF/CNPJ", clienteDoc]);
+    if (clienteDist) rows.push(["Distribuidora/UC", clienteDist]);
+    if (clienteCidade) rows.push(["Cidade", clienteCidade]);
+
+    if (rows.length) {
+      // Caixa
+    doc.setDrawColor(229, 231, 235);
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(margin, y, pageW - margin*2, 22 + rows.length*6, 3, 3, "FD");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Identificação", margin + 4, y + 8);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(15, 23, 42);
+
+  let yy = y + 14;
+  rows.forEach(([k, v]) => {
+    doc.setTextColor(100);
+    doc.text(k + ":", margin + 4, yy);
+    doc.setTextColor(15, 23, 42);
+    doc.text(String(v), margin + 35, yy, { maxWidth: pageW - margin*2 - 40 });
+    yy += 6;
+  });
+
+  y = y + 30 + rows.length*6; // empurra o restante
+} else {
+  y = 46; // sem identificação
+}
+
+
+      
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.setTextColor(100);
       doc.text("Valores estimados a partir do consumo informado, perfil selecionado e percentual de desconto.", margin, 41);
 
       // cards topo
-      const cardY = 48, cardH = 18, gap = 4;
+      const cardY = y + 2, cardH = 18, gap = 4;
       const cardW = (pageW - margin * 2 - gap * 2) / 3;
 
       function card(x, y, w, h, title, value, rgb) {
@@ -723,7 +804,7 @@
       card(margin + (cardW + gap) * 2, cardY, cardW, cardH, "Desconto", descontoTxt, [22, 163, 74]);
 
       // boxes resultados
-      const boxY = 70, boxH = 22, boxGap = 4;
+      const boxY = cardY + 22, boxH = 22, boxGap = 4;
       const boxW = (pageW - margin * 2 - boxGap * 3) / 4;
 
       function box(x, y, w, h, title, value, green) {
@@ -780,6 +861,24 @@
         { maxWidth: pageW - margin * 2 }
       );
 
+// ===== Rodapé com contatos =====
+doc.setFont("helvetica", "bold");
+doc.setFontSize(9);
+doc.setTextColor(15, 23, 42);
+doc.text("Contato", pageW - margin, pageH - 33, { align: "right" });
+
+doc.setFont("helvetica", "normal");
+doc.setFontSize(8.5);
+doc.setTextColor(100);
+doc.text(
+  "elysolarhub.com.br\ncontato@elysolarhub.com.br\nWhatsApp: (61) 99614-0478\nInstagram: @elysolarhub\nCNPJ: 64.072.577/0001-91",
+  pageW - margin,
+  pageH - 29,
+  { align: "right" }
+);
+
+
+      
       doc.save(`ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`);
     } finally {
       if (overlay) overlay.style.display = "none";
