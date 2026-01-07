@@ -728,9 +728,6 @@
       doc.setDrawColor(229, 231, 235);
       doc.line(margin, 28, pageW - margin, 28);
 
-      doc.setDrawColor(229, 231, 235);
-      doc.line(margin, 25, pageW - margin, 25);
-
       doc.setTextColor(15, 23, 42);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(16);
@@ -828,57 +825,64 @@
       box(margin + (boxW + boxGap) * 2, boxY, boxW, boxH, "Economia mensal", ecoMensalTxt, true);
       box(margin + (boxW + boxGap) * 3, boxY, boxW, boxH, "Economia anual", ecoAnualTxt, true);
 
-      // disclaimer
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(100);
-      doc.text(
-        "Valores meramente ilustrativos. Não representam promessa de economia, garantia de resultado ou oferta comercial de energia.",
-        margin,
-        102,
-        { maxWidth: pageW - margin * 2 }
-      );
+      // ===== DISCLAIMER (dinâmico, nunca em cima dos cards) =====
+const discY = boxY + boxH + 10;
 
-      // transparência rodapé
-      doc.setDrawColor(229, 231, 235);
-      doc.line(margin, pageH - 40, pageW - margin, pageH - 40);
+doc.setFont("helvetica", "normal");
+doc.setFontSize(9);
+doc.setTextColor(100);
+doc.text(
+  "Valores meramente ilustrativos. Não representam promessa de economia, garantia de resultado ou oferta comercial de energia.",
+  margin,
+  discY,
+  { maxWidth: pageW - margin * 2 }
+);
 
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
-      doc.setTextColor(15, 23, 42);
-      doc.text("Transparência:", margin, pageH - 33);
+// ===== RODAPÉ EM 2 COLUNAS (sem sobreposição) =====
+const footerTopY = pageH - 58; // área reservada do rodapé
+doc.setDrawColor(229, 231, 235);
+doc.line(margin, footerTopY, pageW - margin, footerTopY);
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.5);
-      doc.setTextColor(100);
-      doc.text(
-        "Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE. " +
-        "Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado. " +
-        "Simulações têm caráter exclusivamente ilustrativo.\n\n" +
-        "Base documental: fatura emitida pela distribuidora. Em caso de divergência, conferência conjunta com documentos oficiais.",
-        margin,
-        pageH - 29,
-        { maxWidth: pageW - margin * 2 }
-      );
+// coluna direita (Contato)
+const rightColW = 58; // largura reservada p/ contato (ajuste fino se quiser)
+const rightX = pageW - margin;
+const leftMaxW = (pageW - margin * 2) - rightColW - 6; // espaço da coluna esquerda
 
-// ===== Rodapé com contatos =====
 doc.setFont("helvetica", "bold");
 doc.setFontSize(9);
 doc.setTextColor(15, 23, 42);
-doc.text("Contato", pageW - margin, pageH - 33, { align: "right" });
+doc.text("Contato", rightX, footerTopY + 8, { align: "right" });
 
 doc.setFont("helvetica", "normal");
 doc.setFontSize(8.5);
 doc.setTextColor(100);
 doc.text(
   "elysolarhub.com.br\ncontato@elysolarhub.com.br\nWhatsApp: (61) 99614-0478\nInstagram: @elysolarhub\nCNPJ: 64.072.577/0001-91",
-  pageW - margin,
-  pageH - 29,
+  rightX,
+  footerTopY + 12,
   { align: "right" }
 );
 
+// coluna esquerda (Transparência)
+doc.setFont("helvetica", "bold");
+doc.setFontSize(9);
+doc.setTextColor(15, 23, 42);
+doc.text("Transparência:", margin, footerTopY + 8);
 
-      
+doc.setFont("helvetica", "normal");
+doc.setFontSize(8.5);
+doc.setTextColor(100);
+doc.text(
+  "Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE. " +
+  "Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado. " +
+  "Simulações têm caráter exclusivamente ilustrativo.\n\n" +
+  "Base documental: fatura emitida pela distribuidora. Em caso de divergência, conferência conjunta com documentos oficiais.",
+  margin,
+  footerTopY + 12,
+  { maxWidth: leftMaxW }
+);
+
+           
       doc.save(`ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`);
     } finally {
       if (overlay) overlay.style.display = "none";
