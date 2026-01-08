@@ -817,30 +817,32 @@ if (perfil === "personalizado") {
       doc.setTextColor(100);
       doc.text("Valores estimados a partir do consumo informado, perfil selecionado e percentual de desconto.", margin, 41);
 
-      // cards topo
-      const cardY = y + 2, cardH = 18, gap = 4;
-      const cardW = (pageW - margin * 2 - gap * 2) / 3;
-      const precoTxt = `R$ ${precoPerfil.toFixed(2).replace(".", ",")}/kWh`;
+      // ===== preço usado no cálculo (precisa existir também no PDF) =====
+let precoPerfil = 0;
+if (perfil === "comercial") precoPerfil = 0.84;
+if (perfil === "residencial") precoPerfil = 0.84;
+if (perfil === "rural") precoPerfil = 0.70;
 
-  
-      function card(x, y, w, h, title, value, rgb) {
-        doc.setDrawColor(229, 231, 235);
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(x, y, w, h, 3, 3, "FD");
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(100);
-        doc.text(title, x + 4, y + 6);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        if (rgb) doc.setTextColor(rgb[0], rgb[1], rgb[2]); else doc.setTextColor(15, 23, 42);
-        doc.text(value, x + 4, y + 14);
-      }
+if (perfil === "personalizado") {
+  const precoInformado = parsePrecoBR(document.getElementById("precoPersonalizado").value);
+  if (!isFinite(precoInformado) || precoInformado <= 0) {
+    alert("Informe um preço válido para o perfil personalizado.");
+    return;
+  }
+  precoPerfil = precoInformado;
+}
 
-      card(margin, cardY, cardW, cardH, "Consumo médio", consumoTxt);
-      card(margin + (cardW + gap) * 1, cardY, cardW, cardH, "Perfil", perfilTxt);
-      card(margin + (cardW + gap) * 2, cardY, cardW, cardH, "Desconto", descontoTxt, { accent: true });
-      card(margin + (cardW + gap) * 3, cardY, cardW, cardH, "Preço (R$/kWh)", precoTxt);
+// ===== cards topo (AGORA 4 colunas) =====
+const cardY = y + 2, cardH = 18, gap = 4;
+const cardW = (pageW - margin * 2 - gap * 3) / 4; // 4 cards => 3 gaps
+const precoTxt = `R$ ${precoPerfil.toFixed(2).replace(".", ",")}/kWh`;
+
+// sua função card espera rgb = [r,g,b]
+card(margin + (cardW + gap) * 0, cardY, cardW, cardH, "Consumo médio", consumoTxt);
+card(margin + (cardW + gap) * 1, cardY, cardW, cardH, "Perfil", perfilTxt);
+card(margin + (cardW + gap) * 2, cardY, cardW, cardH, "Desconto", descontoTxt, [22, 163, 74]); // verde
+card(margin + (cardW + gap) * 3, cardY, cardW, cardH, "Preço (R$/kWh)", precoTxt);
+
 
 
       
