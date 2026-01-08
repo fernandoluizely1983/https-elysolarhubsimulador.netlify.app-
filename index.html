@@ -820,7 +820,9 @@ if (perfil === "personalizado") {
       // cards topo
       const cardY = y + 2, cardH = 18, gap = 4;
       const cardW = (pageW - margin * 2 - gap * 2) / 3;
+      const precoTxt = `R$ ${precoPerfil.toFixed(2).replace(".", ",")}/kWh`;
 
+  
       function card(x, y, w, h, title, value, rgb) {
         doc.setDrawColor(229, 231, 235);
         doc.setFillColor(255, 255, 255);
@@ -836,9 +838,12 @@ if (perfil === "personalizado") {
       }
 
       card(margin, cardY, cardW, cardH, "Consumo médio", consumoTxt);
-      card(margin + cardW + gap, cardY, cardW, cardH, "Perfil", perfilTxt);
-      card(margin + (cardW + gap) * 2, cardY, cardW, cardH, "Desconto", descontoTxt, [22, 163, 74]);
+      card(margin + (cardW + gap) * 1, cardY, cardW, cardH, "Perfil", perfilTxt);
+      card(margin + (cardW + gap) * 2, cardY, cardW, cardH, "Desconto", descontoTxt, { accent: true });
+      card(margin + (cardW + gap) * 3, cardY, cardW, cardH, "Preço (R$/kWh)", precoTxt);
 
+
+      
       // boxes resultados
       const boxY = cardY + 22, boxH = 22, boxGap = 4;
       const boxW = (pageW - margin * 2 - boxGap * 3) / 4;
