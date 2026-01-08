@@ -307,6 +307,7 @@
       font-size:13px;
       padding:14px 20px 22px;
     }
+      .hidden{display:none;}
   </style>
 </head>
 
@@ -339,33 +340,21 @@
               <option value="comercial">Comercial</option>
               <option value="residencial">Residencial</option>
               <option value="rural">Rural</option>
+              <option value="personalizado">Personalizado</option>
             </select>
             <div class="helper">
               Tarifa de referência ilustrativa:
-              Comercial R$ 0,90 | Residencial R$ 0,89 | Rural R$ 0,70
+              Comercial R$ 0,90 | Residencial R$ 0,89 | Rural R$ 0,70 | Personalizado (você define)
             </div>
           </div>
-          <!-- ===== Campos opcionais (aparecem no PDF só se preenchidos) ===== -->
-          <div>
-            <label for="clienteNome">Nome do cliente (opcional)</label>
-              <input type="text" id="clienteNome" placeholder="Ex.: João da Silva" />
-          </div>
-          
-          <div>
-            <label for="clienteDoc">CPF/CNPJ (opcional)</label>
-              <input type="text" id="clienteDoc" placeholder="Ex.: 000.000.000-00 ou 00.000.000/0000-00" />
-          </div>
-          
-          <div>
-            <label for="clienteDist">Distribuidora / UC (opcional)</label>
-            <input type="text" id="clienteDist" placeholder="Ex.: COPEL / UC 123456789" />
-          </div>
-          
-          <div>
-            <label for="clienteCidade">Cidade (opcional)</label>
-            <input type="text" id="clienteCidade" placeholder="Ex.: São Paulo - SP" />
-          </div>
         </div>
+
+          <!-- Preço do perfil (apenas para Personalizado) -->
+          <div id="precoWrap" class="hidden">
+            <label for="precoPersonalizado">Preço do perfil (R$/kWh)</label>
+            <input type="text" id="precoPersonalizado" placeholder="Ex.: 0,85" inputmode="decimal" autocomplete="off" />
+            <div class="helper">Informe o preço no formato 0,85 (aceita vírgula ou ponto).</div>
+          </div>
 
         <div class="actions">
           <button class="btn-primary" type="submit">Calcular</button>
@@ -566,329 +555,211 @@
     <div class="copyright">© 2026 Ely SolarHub Ltda — Todos os direitos reservados.</div>
   </footer>
 
- <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<script>
-  const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  <script>
+    const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  function perfilLabel(value){
-    if (value === "comercial") return "Comercial";
-    if (value === "residencial") return "Residencial";
-    if (value === "rural") return "Rural";
-    return "—";
-  }
-
-  function kwhLabel(valor){
-    const n = Number(valor);
-    if (!isFinite(n)) return "—";
-    return n.toLocaleString("pt-BR") + " kWh/mês";
-  }
-
-  function calcular(){
-    const consumo = parseFloat(document.getElementById("consumo").value);
-    const desconto = parseFloat(document.getElementById("desconto").value);
-    const perfil = document.getElementById("perfil").value;
-
-    if (!isFinite(consumo) || consumo <= 0) return;
-
-    // valida desconto 1 a 30
-    if (!isFinite(desconto) || desconto < 1 || desconto > 30) {
-      alert("Desconto precisa estar entre 1% e 30%");
-      return;
+    function parsePrecoBR(raw){
+      const s = String(raw ?? '').trim();
+      if (!s) return NaN;
+      const cleaned = s.replace(/[^0-9,\.]/g, '');
+      const normalized = cleaned.replace(',', '.');
+      return parseFloat(normalized);
     }
 
-    if (!perfil) return;
 
-    let precoPerfil = 0;
-    if (perfil === "comercial") precoPerfil = 0.90;
-    if (perfil === "residencial") precoPerfil = 0.89;
-    if (perfil === "rural") precoPerfil = 0.70;
+    function calcular(){
+      const consumo = parseFloat(document.getElementById("consumo").value);
+      const desconto = parseFloat(document.getElementById("desconto").value);
+      const perfil = document.getElementById("perfil").value;
 
-    const vrsc = consumo * precoPerfil;
-    const vef = vrsc * (1 - desconto / 100);
-    const economiaMensal = Math.max(vrsc - vef, 0);
-    const economiaAnual = economiaMensal * 12;
+      if (!isFinite(consumo) || consumo <= 0) return;
+      if (!isFinite(desconto) || desconto < 1 || desconto > 30) {
+        alert("Desconto precisa estar entre 1% e 30%");
+        return;
+      }
+      if (!perfil) return;
 
-    document.getElementById("vrsc").innerText = brl.format(vrsc);
-    document.getElementById("vef").innerText = brl.format(vef);
-    document.getElementById("economiaMensal").innerText = brl.format(economiaMensal);
-    document.getElementById("economiaAnual").innerText = brl.format(economiaAnual);
+      let precoPerfil = 0;
+      if (perfil === "comercial") precoPerfil = 0.90;
+      if (perfil === "residencial") precoPerfil = 0.89;
+      if (perfil === "rural") precoPerfil = 0.70;
+      if (perfil === "personalizado") {
+        const p = parsePrecoBR(document.getElementById("precoPersonalizado").value);
+        if (!isFinite(p) || p <= 0) {
+          alert("Informe um preço válido para o perfil Personalizado.");
+          return;
+        }
+        precoPerfil = p;
+      }
 
-    document.getElementById("results").style.display = "block";
-  }
+      const vrsc = consumo * precoPerfil;
+      const vef = vrsc * (1 - desconto / 100);
+      const economiaMensal = Math.max(vrsc - vef, 0);
+      const economiaAnual = economiaMensal * 12;
 
-  function limpar(){
-    document.getElementById("consumo").value = "";
-    document.getElementById("desconto").value = "";
-    document.getElementById("perfil").value = "";
-    document.getElementById("results").style.display = "none";
-    document.getElementById("clienteNome").value = "";
-    document.getElementById("clienteDoc").value = "";
-    document.getElementById("clienteDist").value = "";
-    document.getElementById("clienteCidade").value = "";
-  }
+      document.getElementById("vrsc").innerText = brl.format(vrsc);
+      document.getElementById("vef").innerText = brl.format(vef);
+      document.getElementById("economiaMensal").innerText = brl.format(economiaMensal);
+      document.getElementById("economiaAnual").innerText = brl.format(economiaAnual);
 
-  function ensureCalculatedOrFail(){
-    const form = document.getElementById("simForm");
-    if (!form.checkValidity()){
-      form.reportValidity();
-      return false;
+      document.getElementById("results").style.display = "block";
     }
-    calcular();
-    return document.getElementById("results").style.display === "block";
-  }
 
-  async function loadImageAsDataURL(src) {
-    const res = await fetch(src, { cache: "no-store" });
-    const blob = await res.blob();
-    return await new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(r.result);
-      r.onerror = reject;
-      r.readAsDataURL(blob);
+    function limpar(){
+      document.getElementById("consumo").value = "";
+      document.getElementById("desconto").value = "";
+      document.getElementById("perfil").value = "";
+      const pw = document.getElementById("precoPersonalizado");
+      if (pw) pw.value = "";
+      const wrap = document.getElementById("precoWrap");
+      if (wrap) wrap.classList.add("hidden");
+      document.getElementById("results").style.display = "none";
+    }
+
+    document.getElementById("btnLimpar").addEventListener("click", limpar);
+
+    
+
+    function togglePrecoPersonalizado(){
+      const perfil = document.getElementById("perfil").value;
+      const wrap = document.getElementById("precoWrap");
+      const inp = document.getElementById("precoPersonalizado");
+      if (!wrap || !inp) return;
+
+      if (perfil === "personalizado"){
+        wrap.classList.remove("hidden");
+        inp.required = true;
+      } else {
+        wrap.classList.add("hidden");
+        inp.required = false;
+        inp.value = "";
+      }
+    }
+
+    document.getElementById("perfil").addEventListener("change", togglePrecoPersonalizado);
+    togglePrecoPersonalizado();
+document.getElementById("simForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      if (!this.checkValidity()){
+        this.reportValidity();
+        return;
+      }
+      calcular();
     });
-  }
 
-  // Eventos
-  document.getElementById("btnLimpar").addEventListener("click", limpar);
-
-  document.getElementById("simForm").addEventListener("submit", function(e){
-    e.preventDefault();
-    if (!this.checkValidity()){
-      this.reportValidity();
-      return;
+    function perfilLabel(value, precoCustom){
+      if (value === "comercial") return "Comercial";
+      if (value === "residencial") return "Residencial";
+      if (value === "rural") return "Rural";
+      if (value === "personalizado") {
+        const p = (typeof precoCustom === "number" && isFinite(precoCustom)) ? precoCustom : null;
+        return p ? `Personalizado (R$ ${p.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2})})` : "Personalizado";
+      }
+      return "—";
     }
-    calcular();
-  });
 
-  document.getElementById("btnPdf").addEventListener("click", async () => {
-    if (!ensureCalculatedOrFail()) return;
-
-    const consumo = Number(document.getElementById("consumo").value);
-    const desconto = Number(document.getElementById("desconto").value);
-    const perfil = document.getElementById("perfil").value;
-    const clienteNome = (document.getElementById("clienteNome")?.value || "").trim();
-    const clienteDoc  = (document.getElementById("clienteDoc")?.value || "").trim();
-    const clienteDist = (document.getElementById("clienteDist")?.value || "").trim();
-    const clienteCidade = (document.getElementById("clienteCidade")?.value || "").trim();
-
-
-    if (!isFinite(consumo) || consumo <= 0) return;
-    if (!isFinite(desconto) || desconto < 1 || desconto > 30) {
-      alert("Desconto precisa estar entre 1% e 30%");
-      return;
+    function kwhLabel(valor){
+      const n = Number(valor);
+      if (!isFinite(n)) return "—";
+      return n.toLocaleString("pt-BR") + " kWh/mês";
     }
-    if (!perfil) return;
 
-    const vrscTxt = document.getElementById("vrsc").innerText;
-    const vefTxt = document.getElementById("vef").innerText;
-    const ecoMensalTxt = document.getElementById("economiaMensal").innerText;
-    const ecoAnualTxt = document.getElementById("economiaAnual").innerText;
+    function ensureCalculatedOrFail(){
+      const results = document.getElementById("results");
+      if (!results || results.style.display !== "block") {
+        const form = document.getElementById("simForm");
+        if (!form.checkValidity()){
+          form.reportValidity();
+          return false;
+        }
+        calcular();
+        if (document.getElementById("results").style.display !== "block") return false;
+      }
+      return true;
+    }
 
-    const perfilTxt = perfilLabel(perfil);
-    const consumoTxt = kwhLabel(consumo);
-    const descontoTxt = `${desconto.toLocaleString("pt-BR")} %`;
-    const dataTxt = new Date().toLocaleString("pt-BR");
+    document.getElementById("btnPdf").addEventListener("click", async () => {
+      if (!ensureCalculatedOrFail()) return;
 
-    const overlay = document.getElementById("pdfOverlay");
-    if (overlay) overlay.style.display = "flex";
+      const consumo = document.getElementById("consumo").value;
+      const desconto = document.getElementById("desconto").value;
+      const perfil = document.getElementById("perfil").value;
 
-    try {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+      const vrsc = document.getElementById("vrsc").innerText;
+      const vef = document.getElementById("vef").innerText;
+      const ecoMensal = document.getElementById("economiaMensal").innerText;
+      const ecoAnual = document.getElementById("economiaAnual").innerText;
 
-      const pageW = doc.internal.pageSize.getWidth();
-      const pageH = doc.internal.pageSize.getHeight();
-      const margin = 12;
+      document.getElementById("pdfDate").innerText = new Date().toLocaleString("pt-BR");
+      document.getElementById("pdfConsumo").innerText = kwhLabel(consumo);
+      document.getElementById("pdfPerfil").innerText = perfilLabel(perfil);
+      document.getElementById("pdfDesconto").innerText = `${Number(desconto).toLocaleString("pt-BR")} %`;
 
-      // Logo (logo.png no root)
-      let logoDataUrl = null;
-      try { logoDataUrl = await loadImageAsDataURL("logo.png"); } catch(e){}
+      document.getElementById("pdfVrsc").innerText = vrsc;
+      document.getElementById("pdfVef").innerText = vef;
+      document.getElementById("pdfEcoMensal").innerText = ecoMensal;
+      document.getElementById("pdfEcoAnual").innerText = ecoAnual;
 
-      if (logoDataUrl) doc.addImage(logoDataUrl, "PNG", margin, 10, 40, 12);
-      
-      // ===== Cabeçalho forte: Proposta / Nº / Validade =====
-      const propostaNum = "ESH-" + new Date().toISOString().slice(0,10).replaceAll("-","") + "-" + String(Math.floor(Math.random()*9000)+1000);
-      const validadeDias = 7;
-      const validadeDate = new Date(Date.now() + validadeDias*24*60*60*1000);
-      const validadeTxt = validadeDate.toLocaleDateString("pt-BR");
-      
-      doc.setTextColor(15, 23, 42);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text("Proposta Comercial / Simulação", pageW - margin, 14, { align: "right" });
+      const element = document.getElementById("pdfRoot");
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Nº: ${propostaNum}`, pageW - margin, 19, { align: "right" });
-      doc.text(`Validade: até ${validadeTxt}`, pageW - margin, 24, { align: "right" });
+/* --- TRUQUE: coloca o template dentro da viewport (invisível) --- */
+const prev = {
+  position: element.style.position,
+  left: element.style.left,
+  top: element.style.top,
+  opacity: element.style.opacity,
+  pointerEvents: element.style.pointerEvents,
+  zIndex: element.style.zIndex
+};
 
-      // Linha
-      doc.setDrawColor(229, 231, 235);
-      doc.line(margin, 28, pageW - margin, 28);
+const overlay = document.getElementById("pdfOverlay");
+overlay.style.display = "flex";
 
-      doc.setTextColor(15, 23, 42);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(16);
-      doc.text("Proposta de Simulação", margin, 35);
+element.style.position = "fixed";
+element.style.left = "0";
+element.style.top = "0";
+element.style.opacity = "1";                 // <<< IMPORTANTÍSSIMO: não pode ser 0
+element.style.pointerEvents = "none";
+element.style.zIndex = "1";                  // fica “atrás” do overlay
 
-      // ===== Bloco de identificação (opcional) =====
-      let y = 46; // posição inicial após o texto introdutório (ajuste se necessário)
 
-      const rows = [];
-     if (clienteNome) rows.push(["Cliente", clienteNome]);
-    if (clienteDoc) rows.push(["CPF/CNPJ", clienteDoc]);
-    if (clienteDist) rows.push(["Distribuidora/UC", clienteDist]);
-    if (clienteCidade) rows.push(["Cidade", clienteCidade]);
+// garante que o browser renderizou antes do canvas
+await new Promise(r => requestAnimationFrame(r));
+await new Promise(r => setTimeout(r, 120));
 
-    if (rows.length) {
-      // Caixa
-    doc.setDrawColor(229, 231, 235);
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(margin, y, pageW - margin*2, 22 + rows.length*6, 3, 3, "FD");
+const opt = {
+  margin: [10, 10, 10, 10],
+  filename: `ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`,
+  image: { type: "jpeg", quality: 0.95 },
+  html2canvas: {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+    windowWidth: element.scrollWidth,
+    windowHeight: element.scrollHeight
+  },
+  jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+};
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.setTextColor(15, 23, 42);
-    doc.text("Identificação", margin + 4, y + 8);
+try {
+  await html2pdf().set(opt).from(element).save();
+} finally {
+  // restaura estado original
+  element.style.position = prev.position;
+  element.style.left = prev.left;
+  element.style.top = prev.top;
+  element.style.opacity = prev.opacity;
+  element.style.pointerEvents = prev.pointerEvents;
+  element.style.zIndex = prev.zIndex;
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9.5);
-    doc.setTextColor(15, 23, 42);
+  overlay.style.display = "none";
 
-  let yy = y + 14;
-  rows.forEach(([k, v]) => {
-    doc.setTextColor(100);
-    doc.text(k + ":", margin + 4, yy);
-    doc.setTextColor(15, 23, 42);
-    doc.text(String(v), margin + 35, yy, { maxWidth: pageW - margin*2 - 40 });
-    yy += 6;
-  });
-
-  y = y + 30 + rows.length*6; // empurra o restante
-} else {
-  y = 46; // sem identificação
 }
 
-
-      
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text("Valores estimados a partir do consumo informado, perfil selecionado e percentual de desconto.", margin, 41);
-
-      // cards topo
-      const cardY = y + 2, cardH = 18, gap = 4;
-      const cardW = (pageW - margin * 2 - gap * 2) / 3;
-
-      function card(x, y, w, h, title, value, rgb) {
-        doc.setDrawColor(229, 231, 235);
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(x, y, w, h, 3, 3, "FD");
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(100);
-        doc.text(title, x + 4, y + 6);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        if (rgb) doc.setTextColor(rgb[0], rgb[1], rgb[2]); else doc.setTextColor(15, 23, 42);
-        doc.text(value, x + 4, y + 14);
-      }
-
-      card(margin, cardY, cardW, cardH, "Consumo médio", consumoTxt);
-      card(margin + cardW + gap, cardY, cardW, cardH, "Perfil", perfilTxt);
-      card(margin + (cardW + gap) * 2, cardY, cardW, cardH, "Desconto", descontoTxt, [22, 163, 74]);
-
-      // boxes resultados
-      const boxY = cardY + 22, boxH = 22, boxGap = 4;
-      const boxW = (pageW - margin * 2 - boxGap * 3) / 4;
-
-      function box(x, y, w, h, title, value, green) {
-        doc.setDrawColor(229, 231, 235);
-        if (green) doc.setFillColor(240, 253, 244); else doc.setFillColor(255, 255, 255);
-        doc.roundedRect(x, y, w, h, 3, 3, "FD");
-
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(green ? 22 : 100, green ? 101 : 100, green ? 52 : 100);
-        doc.text(title, x + 4, y + 7);
-
-        doc.setFont("helvetica", green ? "bold" : "normal");
-        doc.setFontSize(12);
-        doc.setTextColor(green ? 22 : 15, green ? 163 : 23, green ? 74 : 42);
-        doc.text(value, x + 4, y + 16);
-      }
-
-      box(margin, boxY, boxW, boxH, "VRSC", vrscTxt, false);
-      box(margin + (boxW + boxGap) * 1, boxY, boxW, boxH, "VEF", vefTxt, false);
-      box(margin + (boxW + boxGap) * 2, boxY, boxW, boxH, "Economia mensal", ecoMensalTxt, true);
-      box(margin + (boxW + boxGap) * 3, boxY, boxW, boxH, "Economia anual", ecoAnualTxt, true);
-
-      // ===== DISCLAIMER (dinâmico, nunca em cima dos cards) =====
-const discY = boxY + boxH + 10;
-
-doc.setFont("helvetica", "normal");
-doc.setFontSize(9);
-doc.setTextColor(100);
-doc.text(
-  "Valores meramente ilustrativos. Não representam promessa de economia, garantia de resultado ou oferta comercial de energia.",
-  margin,
-  discY,
-  { maxWidth: pageW - margin * 2 }
-);
-
-// ===== RODAPÉ EM 2 COLUNAS (sem sobreposição) =====
-const footerTopY = pageH - 58; // área reservada do rodapé
-doc.setDrawColor(229, 231, 235);
-doc.line(margin, footerTopY, pageW - margin, footerTopY);
-
-// coluna direita (Contato)
-const rightColW = 58; // largura reservada p/ contato (ajuste fino se quiser)
-const rightX = pageW - margin;
-const leftMaxW = (pageW - margin * 2) - rightColW - 6; // espaço da coluna esquerda
-
-doc.setFont("helvetica", "bold");
-doc.setFontSize(9);
-doc.setTextColor(15, 23, 42);
-doc.text("Contato", rightX, footerTopY + 8, { align: "right" });
-
-doc.setFont("helvetica", "normal");
-doc.setFontSize(8.5);
-doc.setTextColor(100);
-doc.text(
-  "elysolarhub.com.br\ncontato@elysolarhub.com.br\nWhatsApp: (61) 99614-0478\nInstagram: @elysolarhub\nCNPJ: 64.072.577/0001-91",
-  rightX,
-  footerTopY + 12,
-  { align: "right" }
-);
-
-// coluna esquerda (Transparência)
-doc.setFont("helvetica", "bold");
-doc.setFontSize(9);
-doc.setTextColor(15, 23, 42);
-doc.text("Transparência:", margin, footerTopY + 8);
-
-doc.setFont("helvetica", "normal");
-doc.setFontSize(8.5);
-doc.setTextColor(100);
-doc.text(
-  "Prestamos serviços de gestão administrativa e regulatória relacionados à participação no SCEE. " +
-  "Não comercializamos energia elétrica e não garantimos economia mínima, compensação integral ou resultado. " +
-  "Simulações têm caráter exclusivamente ilustrativo.\n\n" +
-  "Base documental: fatura emitida pela distribuidora. Em caso de divergência, conferência conjunta com documentos oficiais.",
-  margin,
-  footerTopY + 12,
-  { maxWidth: leftMaxW }
-);
-
-           
-      doc.save(`ElySolarHub_Simulacao_${new Date().toISOString().slice(0,10)}.pdf`);
-    } finally {
-      if (overlay) overlay.style.display = "none";
-    }
-  });
-</script>
+    });
+  </script>
   
    <!-- Overlay simples para não “piscar” o template do PDF -->
   <div id="pdfOverlay" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,.85); z-index:99999; align-items:center; justify-content:center; font-family:Inter, Arial, sans-serif;">
