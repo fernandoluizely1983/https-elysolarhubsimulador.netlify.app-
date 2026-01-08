@@ -843,11 +843,12 @@ card(margin + (cardW + gap) * 1, cardY, cardW, cardH, "Perfil", perfilTxt);
 card(margin + (cardW + gap) * 2, cardY, cardW, cardH, "Desconto", descontoTxt, [22, 163, 74]); // verde
 card(margin + (cardW + gap) * 3, cardY, cardW, cardH, "Preço (R$/kWh)", precoTxt);
 
+// IMPORTANTE: avançar o cursor "y" para o restante do layout
+y = cardY + cardH + 8;
 
+// boxes resultados
+const boxY = y, boxH = 22, boxGap = 4;
 
-      
-      // boxes resultados
-      const boxY = cardY + 22, boxH = 22, boxGap = 4;
       const boxW = (pageW - margin * 2 - boxGap * 3) / 4;
 
       function box(x, y, w, h, title, value, green) {
