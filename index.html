@@ -332,19 +332,35 @@
             <div class="helper">De 1 a 30. Ex.: 15 significa 15%.</div>
           </div>
 
-          <div>
-            <label for="perfil">Perfil</label>
-            <select id="perfil" required>
-              <option value="" selected disabled>Selecione o perfil</option>
-              <option value="comercial">Comercial</option>
-              <option value="residencial">Residencial</option>
-              <option value="rural">Rural</option>
-            </select>
-            <div class="helper">
-              Tarifa de referência ilustrativa:
-              Comercial R$ 0,90 | Residencial R$ 0,89 | Rural R$ 0,70
-            </div>
-          </div>
+<div>
+  <label for="perfil">Perfil</label>
+  <select id="perfil" required>
+    <option value="" selected disabled>Selecione o perfil</option>
+    <option value="comercial">Comercial</option>
+    <option value="residencial">Residencial</option>
+    <option value="rural">Rural</option>
+    <option value="personalizado">Personalizado</option>
+  </select>
+
+  <div class="helper">
+    Tarifa de referência ilustrativa:
+    Comercial R$ 0,84 | Residencial R$ 0,84 | Rural R$ 0,70
+  </div>
+</div>
+
+<!-- Campo que aparece somente quando Perfil = Personalizado -->
+<div id="precoPersonalizadoWrap" style="display:none;">
+  <label for="precoPersonalizado">Preço do perfil (R$/kWh)</label>
+  <input
+    type="text"
+    id="precoPersonalizado"
+    inputmode="decimal"
+    placeholder="Ex.: 0,85"
+    autocomplete="off"
+  />
+  <div class="helper">Informe o preço no formato <strong>0,85</strong> (aceita vírgula).</div>
+</div>
+
           <!-- ===== Campos opcionais (aparecem no PDF só se preenchidos) ===== -->
           <div>
             <label for="clienteNome">Nome do cliente (opcional)</label>
@@ -568,6 +584,7 @@
 
  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
+  
 <script>
   const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -575,6 +592,7 @@
     if (value === "comercial") return "Comercial";
     if (value === "residencial") return "Residencial";
     if (value === "rural") return "Rural";
+    if (value === "personalizado") return "Personalizado";
     return "—";
   }
 
@@ -584,6 +602,12 @@
     return n.toLocaleString("pt-BR") + " kWh/mês";
   }
 
+function parsePrecoBR(valor){
+  if (valor == null) return NaN;
+  const txt = String(valor).trim().replace(/\s/g, "").replace(",", ".");
+  return parseFloat(txt);
+}
+  
   function calcular(){
     const consumo = parseFloat(document.getElementById("consumo").value);
     const desconto = parseFloat(document.getElementById("desconto").value);
@@ -600,9 +624,21 @@
     if (!perfil) return;
 
     let precoPerfil = 0;
-    if (perfil === "comercial") precoPerfil = 0.90;
-    if (perfil === "residencial") precoPerfil = 0.89;
-    if (perfil === "rural") precoPerfil = 0.70;
+if (perfil === "comercial") precoPerfil = 0.84;
+if (perfil === "residencial") precoPerfil = 0.84;
+if (perfil === "rural") precoPerfil = 0.70;
+
+if (perfil === "personalizado") {
+  const precoInformado = parsePrecoBR(document.getElementById("precoPersonalizado").value);
+
+  if (!isFinite(precoInformado) || precoInformado <= 0) {
+    alert("Informe um preço válido para o perfil personalizado.");
+    return;
+  }
+
+  precoPerfil = precoInformado;
+}
+
 
     const vrsc = consumo * precoPerfil;
     const vef = vrsc * (1 - desconto / 100);
@@ -626,6 +662,9 @@
     document.getElementById("clienteDoc").value = "";
     document.getElementById("clienteDist").value = "";
     document.getElementById("clienteCidade").value = "";
+    document.getElementById("precoPersonalizado").value = "";
+    document.getElementById("precoPersonalizadoWrap").style.display = "none";
+
   }
 
   function ensureCalculatedOrFail(){
@@ -888,6 +927,24 @@ doc.text(
       if (overlay) overlay.style.display = "none";
     }
   });
+(function bindPersonalizado(){
+  const perfilEl = document.getElementById("perfil");
+  const wrap = document.getElementById("precoPersonalizadoWrap");
+  const precoEl = document.getElementById("precoPersonalizado");
+
+  function toggle(){
+    const isPers = perfilEl.value === "personalizado";
+    wrap.style.display = isPers ? "block" : "none";
+    precoEl.required = isPers;
+
+    if (!isPers) precoEl.value = "";
+  }
+
+  perfilEl.addEventListener("change", toggle);
+  toggle();
+})();
+
+  
 </script>
   
    <!-- Overlay simples para não “piscar” o template do PDF -->
